@@ -1,0 +1,274 @@
+<div class="account-details-container">
+  <header class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Account Details</h1>
+        <p class="subtitle">Manage and view all account information</p>
+      </div>
+      <div class="header-actions">
+        <button class="export-all-button" (click)="exportAllAccountsToPDF()" *ngIf="filteredAccounts.length > 0">
+          📊 Export All Accounts
+        </button>
+        <button class="add-account-button" (click)="openAddAccountForm()">
+          <span class="button-icon">+</span> Add New Account
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="🔍 Search by account number or name..."
+          [(ngModel)]="searchQuery"
+          (input)="searchAccounts()"
+        />
+        <button
+          *ngIf="searchQuery"
+          class="clear-search-btn"
+          (click)="clearSearch()"
+          title="Clear search">
+          ✕
+        </button>
+      </div>
+      <div class="search-results" *ngIf="searchQuery">
+        <span class="results-count">Found {{ filteredAccounts.length }} account(s)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading account details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button (click)="loadAccounts()" class="retry-button">Retry</button>
+  </div>
+
+  <!-- Account Summary Cards -->
+  <div *ngIf="!loading && !error && filteredAccounts.length > 0" class="summary-section">
+    <div class="summary-card">
+      <div class="card-icon">👥</div>
+      <div class="card-content">
+        <h3>Total Accounts</h3>
+        <p class="amount">{{ getTotalAccounts() }}</p>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="card-icon">💰</div>
+      <div class="card-content">
+        <h3>Total Fund Amount</h3>
+        <p class="amount">₹{{ getTotalFundAmount() | number:'1.2-2' }}</p>
+      </div>
+    </div>
+    <div class="summary-card highlight">
+      <div class="card-icon">💳</div>
+      <div class="card-content">
+        <h3>Total Loan Amount</h3>
+        <p class="amount">₹{{ getTotalLoanAmount() | number:'1.2-2' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accounts Table -->
+  <div *ngIf="!loading && !error && filteredAccounts.length > 0" class="accounts-content">
+    <div class="table-container">
+      <table class="accounts-table">
+        <thead>
+          <tr>
+            <th>Account ID</th>
+            <th>Name</th>
+            <th class="amount-column">Fund Amount</th>
+            <th class="amount-column">Loan Amount</th>
+            <th class="center-column">Pending Payments</th>
+            <th class="center-column">Paid Payments</th>
+            <th class="center-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let account of filteredAccounts" class="account-row">
+            <td class="account-id">{{ account.account }}</td>
+            <td class="account-name">{{ account.name }}</td>
+            <td class="amount-column">₹{{ account.fund_amount | number:'1.2-2' }}</td>
+            <td class="amount-column">₹{{ account.loan_amount | number:'1.2-2' }}</td>
+            <td class="center-column">
+              <span class="badge badge-pending">{{ getPendingPaymentsCount(account) }}</span>
+            </td>
+            <td class="center-column">
+              <span class="badge badge-paid">{{ getPaidPaymentsCount(account) }}</span>
+            </td>
+            <td class="center-column">
+              <div class="action-buttons">
+                <button (click)="viewAccountDetails(account)" class="view-button">
+                  👁️ View Details
+                </button>
+                <button (click)="exportAccountToPDF(account)" class="export-button" title="Export account details to PDF">
+                  📄 Export PDF
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- No Search Results -->
+  <div *ngIf="!loading && !error && searchQuery && filteredAccounts.length === 0" class="empty-state">
+    <p>No accounts found matching "{{ searchQuery }}"</p>
+    <button (click)="clearSearch()" class="retry-button">Clear Search</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && !searchQuery && accounts.length === 0" class="empty-state">
+    <p>No account details available at the moment.</p>
+    <p class="empty-hint">Please upload account data from the <a routerLink="/upload">Upload Page</a></p>
+  </div>
+
+  <!-- Payment Details Modal -->
+  <div *ngIf="showPaymentDetails && selectedAccount" class="modal-overlay" (click)="closeDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h2>{{ selectedAccount.name }}</h2>
+          <p class="modal-subtitle">Account: {{ selectedAccount.account }}</p>
+        </div>
+        <button class="close-button" (click)="closeDetails()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Account Summary -->
+        <div class="account-summary">
+          <div class="summary-item">
+            <span class="label">Fund Amount:</span>
+            <span class="value">₹{{ selectedAccount.fund_amount | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Loan Amount:</span>
+            <span class="value">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Total Due:</span>
+            <span class="value">₹{{ getTotalDueAmount(selectedAccount) | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Total Paid:</span>
+            <span class="value success">₹{{ getTotalPaidAmount(selectedAccount) | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Balance:</span>
+            <span class="value warning">₹{{ getTotalBalanceAmount(selectedAccount) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- Payment Schedule -->
+        <h3 class="section-title">Payment Schedule</h3>
+        <div class="payments-table-container">
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Due No.</th>
+                <th>Due Date</th>
+                <th>Due Amount</th>
+                <th>Loan Interest</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payment of selectedAccount.due_payments">
+                <td class="center-column">{{ payment.due_no }}</td>
+                <td>{{ payment.due_date }}</td>
+                <td class="amount-column">₹{{ payment.due_amount | number:'1.2-2' }}</td>
+                <td class="amount-column">₹{{ payment.loan_interest | number:'1.2-2' }}</td>
+                <td class="amount-column">₹{{ payment.total | number:'1.2-2' }}</td>
+                <td class="amount-column">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
+                <td class="amount-column">₹{{ payment.balance_amount | number:'1.2-2' }}</td>
+                <td class="center-column">
+                  <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
+                    {{ payment.payment_status }}
+                  </span>
+                </td>
+                <td class="center-column">
+                  <button
+                    *ngIf="payment.payment_status === 'paid' || payment.payment_status === 'partial'"
+                    (click)="generatePaymentReceipt(payment, selectedAccount)"
+                    class="receipt-btn"
+                    title="Generate Payment Receipt">
+                    📄 Receipt
+                  </button>
+                  <span *ngIf="payment.payment_status === 'pending'" class="no-action">-</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button (click)="closeDetails()" class="btn-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Account Modal -->
+  <div *ngIf="showAddAccountForm" class="modal-overlay" (click)="closeAddAccountForm()">
+    <div class="modal-content add-account-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h2>Add New Account</h2>
+          <p class="modal-subtitle">Create a new account with auto-generated details</p>
+        </div>
+        <button class="close-button" (click)="closeAddAccountForm()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="accountName">Account Holder Name *</label>
+          <input
+            type="text"
+            id="accountName"
+            [(ngModel)]="newAccountName"
+            placeholder="Enter account holder name"
+            class="form-input"
+            [disabled]="addingAccount"
+            (keyup.enter)="addNewAccount()"
+          />
+          <p class="form-hint">The account will be created with:</p>
+          <ul class="info-list">
+            <li>✓ Auto-generated account number (e.g., AZH-001)</li>
+            <li>✓ Initial fund amount: ₹0.00</li>
+            <li>✓ Initial loan amount: ₹0.00</li>
+            <li>✓ 24 monthly due payments (automatically generated)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          (click)="closeAddAccountForm()"
+          class="btn-cancel"
+          [disabled]="addingAccount">
+          Cancel
+        </button>
+        <button
+          (click)="addNewAccount()"
+          class="btn-primary"
+          [disabled]="!newAccountName.trim() || addingAccount">
+          <span *ngIf="!addingAccount">Create Account</span>
+          <span *ngIf="addingAccount">Creating...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

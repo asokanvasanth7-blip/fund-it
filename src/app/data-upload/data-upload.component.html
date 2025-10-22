@@ -1,0 +1,83 @@
+<div class="upload-container">
+  <h2>Firebase Data Upload</h2>
+
+  <div class="card">
+    <h3>Due Schedule Data</h3>
+    <p>Upload the due schedule mock data to Firebase Firestore.</p>
+
+    <div class="actions">
+      <button
+        (click)="uploadDueSchedule()"
+        [disabled]="uploading"
+        class="btn btn-primary">
+        {{ uploading ? 'Uploading...' : 'Upload Due Schedule to Firebase' }}
+      </button>
+
+      <button
+        (click)="viewExistingData()"
+        [disabled]="uploading"
+        class="btn btn-secondary">
+        View Existing Data
+      </button>
+    </div>
+
+    <div *ngIf="uploading" class="status uploading">
+      <p>⏳ Uploading data to Firebase...</p>
+    </div>
+
+    <div *ngIf="uploadComplete" class="status success">
+      <p>✅ Upload complete! Successfully uploaded {{ uploadedCount }} records.</p>
+      <p>Collection: <strong>dueSchedules</strong></p>
+    </div>
+
+    <div *ngIf="uploadError" class="status error">
+      <p>❌ Upload failed: {{ uploadError }}</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Account Details Data</h3>
+    <p>Upload the account details mock data to Firebase Firestore.</p>
+
+    <div class="actions">
+      <button
+        (click)="uploadAccountDetails()"
+        [disabled]="accountUploading"
+        class="btn btn-primary">
+        {{ accountUploading ? 'Uploading...' : 'Upload Account Details to Firebase' }}
+      </button>
+
+      <button
+        (click)="viewAccountData()"
+        [disabled]="accountUploading"
+        class="btn btn-secondary">
+        View Account Data
+      </button>
+    </div>
+
+    <div *ngIf="accountUploading" class="status uploading">
+      <p>⏳ Uploading account data to Firebase...</p>
+    </div>
+
+    <div *ngIf="accountUploadComplete" class="status success">
+      <p>✅ Upload complete! Successfully uploaded {{ accountUploadedCount }} account records.</p>
+      <p>Collection: <strong>accountDetails</strong></p>
+    </div>
+
+    <div *ngIf="accountUploadError" class="status error">
+      <p>❌ Upload failed: {{ accountUploadError }}</p>
+    </div>
+  </div>
+
+  <div class="info">
+    <h4>Instructions:</h4>
+    <ol>
+      <li>Click "Upload Due Schedule to Firebase" to upload payment schedule data</li>
+      <li>Click "Upload Account Details to Firebase" to upload account records (28 accounts with payment schedules)</li>
+      <li>The data will be stored in "dueSchedules" and "accountDetails" collections</li>
+      <li>Check the browser console for detailed logs</li>
+      <li>Use "View Existing Data" or "View Account Data" to verify the uploads</li>
+    </ol>
+  </div>
+</div>
+

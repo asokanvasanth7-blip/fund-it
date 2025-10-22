@@ -1,0 +1,244 @@
+<div class="payment-collection-container">
+  <header class="page-header">
+    <h1>Payment Collection</h1>
+    <p class="subtitle">Collect and record due payments from accounts</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading accounts...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button (click)="loadAccounts()" class="retry-button">Retry</button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="content-layout">
+    <!-- Accounts List -->
+    <div class="accounts-sidebar">
+      <div class="sidebar-header">
+        <h3>Accounts</h3>
+        <span class="account-count">{{ filteredAccounts.length }}</span>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="filterAccounts()"
+          placeholder="Search by name or ID..."
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="accounts-list">
+        <div
+          *ngFor="let account of filteredAccounts"
+          class="account-card"
+          [class.selected]="selectedAccount?.account === account.account"
+          (click)="selectAccount(account)">
+          <div class="card-header">
+            <div class="account-badge">{{ account.account }}</div>
+            <div class="pending-indicator" *ngIf="getPendingPayments(account).length > 0">
+              {{ getPendingPayments(account).length }}
+            </div>
+          </div>
+          <div class="account-name">{{ account.name }}</div>
+          <div class="card-footer">
+            <div class="info-item">
+              <span class="info-label">Pending:</span>
+              <span class="info-value">₹{{ getTotalPendingAmount(account) | number:'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="filteredAccounts.length === 0" class="no-results">
+          <p>No accounts found</p>
+          <small>Try a different search term</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments List -->
+    <div class="payments-section">
+      <div *ngIf="!selectedAccount" class="empty-selection">
+        <p>👈 Select an account to view pending payments</p>
+      </div>
+
+      <div *ngIf="selectedAccount">
+        <div class="account-info">
+          <div>
+            <h2>{{ selectedAccount.name }}</h2>
+            <p class="account-subtitle">Account: {{ selectedAccount.account }}</p>
+          </div>
+          <div class="account-stats">
+            <div class="stat-item">
+              <span class="stat-label">Pending Payments:</span>
+              <span class="stat-value">{{ getPendingPayments(selectedAccount).length }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Total Pending:</span>
+              <span class="stat-value amount">₹{{ getTotalPendingAmount(selectedAccount) | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="getPendingPayments(selectedAccount).length === 0" class="no-pending">
+          <p>✅ All payments are completed for this account!</p>
+        </div>
+
+        <div *ngIf="getPendingPayments(selectedAccount).length > 0" class="table-container">
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Due No.</th>
+                <th>Due Date</th>
+                <th>Total Due</th>
+                <th>Paid Amount</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payment of getPendingPayments(selectedAccount)">
+                <td class="center">{{ payment.due_no }}</td>
+                <td>{{ payment.due_date }}</td>
+                <td class="amount">₹{{ payment.total | number:'1.2-2' }}</td>
+                <td class="amount">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
+                <td class="amount balance">₹{{ getRemainingBalance(payment) | number:'1.2-2' }}</td>
+                <td class="center">
+                  <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
+                    {{ payment.payment_status }}
+                  </span>
+                </td>
+                <td class="center">
+                  <button
+                    (click)="openPaymentModal(payment)"
+                    class="collect-btn"
+                    [disabled]="!canCollectPayment(payment)"
+                    [title]="!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due'">
+                    💰 Collect Payment
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div *ngIf="showPaymentModal && selectedPayment" class="modal-overlay" (click)="closePaymentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Collect Payment - Due #{{ selectedPayment.due_no }}</h2>
+        <button class="close-button" (click)="closePaymentModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="payment-summary">
+          <div class="summary-row">
+            <span class="label">Account:</span>
+            <span class="value">{{ selectedAccount?.name }} ({{ selectedAccount?.account }})</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Due Date:</span>
+            <span class="value">{{ selectedPayment.due_date }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Total Due:</span>
+            <span class="value amount">₹{{ selectedPayment.total | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Already Paid:</span>
+            <span class="value amount success">₹{{ selectedPayment.paid_amount | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row highlight">
+            <span class="label">Remaining Balance:</span>
+            <span class="value amount">₹{{ getRemainingBalance(selectedPayment) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <form (ngSubmit)="collectPayment()" class="payment-form">
+          <div class="form-group">
+            <label for="amountToPay">Payment Amount (₹) *</label>
+            <input
+              type="number"
+              id="amountToPay"
+              [(ngModel)]="amountToPay"
+              name="amountToPay"
+              class="form-control"
+              step="0.01"
+              min="0"
+              [max]="getRemainingBalance(selectedPayment)"
+              required>
+            <small class="form-hint">Maximum: ₹{{ getRemainingBalance(selectedPayment) | number:'1.2-2' }}</small>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentDate">Payment Date *</label>
+            <input
+              type="date"
+              id="paymentDate"
+              [(ngModel)]="paymentDate"
+              name="paymentDate"
+              class="form-control"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentMethod">Payment Method *</label>
+            <select
+              id="paymentMethod"
+              [(ngModel)]="paymentMethod"
+              name="paymentMethod"
+              class="form-control"
+              required>
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="upi">UPI</option>
+              <option value="cheque">Cheque</option>
+              <option value="card">Card</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentNotes">Notes (Optional)</label>
+            <textarea
+              id="paymentNotes"
+              [(ngModel)]="paymentNotes"
+              name="paymentNotes"
+              class="form-control"
+              rows="3"
+              placeholder="Add any notes about this payment..."></textarea>
+          </div>
+
+          <div *ngIf="paymentSuccess" class="success-message">
+            ✅ Payment collected successfully!
+          </div>
+
+          <div *ngIf="paymentError" class="error-message">
+            ❌ {{ paymentError }}
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closePaymentModal()" class="btn-cancel">Cancel</button>
+        <button type="button" (click)="collectPayment()" [disabled]="processing || amountToPay <= 0" class="btn-collect">
+          {{ processing ? 'Processing...' : 'Collect Payment' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

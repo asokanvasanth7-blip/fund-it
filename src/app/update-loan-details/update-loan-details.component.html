@@ -1,0 +1,205 @@
+<div class="update-loan-container">
+  <header class="page-header">
+    <h1>Update Loan Details</h1>
+    <p class="subtitle">Manage fund amounts and loan amounts for member accounts</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading accounts...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button (click)="loadAccounts()" class="retry-button">Retry</button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="content-layout">
+    <!-- Accounts Sidebar -->
+    <div class="accounts-sidebar">
+      <div class="sidebar-header">
+        <h3>Accounts</h3>
+        <span class="account-count">{{ filteredAccounts.length }}</span>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="filterAccounts()"
+          placeholder="Search by name or ID..."
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="accounts-list">
+        <div
+          *ngFor="let account of filteredAccounts"
+          class="account-card"
+          [class.selected]="selectedAccount?.account === account.account"
+          (click)="selectAccount(account)">
+          <div class="card-header">
+            <div class="account-badge">{{ account.account }}</div>
+          </div>
+          <div class="account-name">{{ account.name }}</div>
+          <div class="card-footer">
+            <div class="info-item">
+              <span class="info-label">Fund:</span>
+              <span class="info-value">₹{{ account.fund_amount | number:'1.0-0' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Loan:</span>
+              <span class="info-value loan-value">₹{{ account.loan_amount | number:'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="filteredAccounts.length === 0" class="no-results">
+          <p>No accounts found</p>
+          <small>Try a different search term</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Details Section -->
+    <div class="details-section">
+      <div *ngIf="!selectedAccount" class="empty-selection">
+        <div class="empty-icon">💰</div>
+        <p>Select an account to update loan details</p>
+      </div>
+
+      <div *ngIf="selectedAccount" class="account-details">
+        <div class="details-header">
+          <div>
+            <h2>{{ selectedAccount.name }}</h2>
+            <p class="account-subtitle">Account: {{ selectedAccount.account }}</p>
+          </div>
+          <button (click)="openEditModal()" class="edit-btn">
+            ✏️ Edit Loan Details
+          </button>
+        </div>
+
+        <div class="details-cards">
+          <div class="detail-card fund-card">
+            <div class="card-icon">💵</div>
+            <div class="card-content">
+              <h3>Fund Amount</h3>
+              <p class="amount">₹{{ selectedAccount.fund_amount | number:'1.2-2' }}</p>
+              <small>Total fund contributed by member</small>
+            </div>
+          </div>
+
+          <div class="detail-card loan-card">
+            <div class="card-icon">💳</div>
+            <div class="card-content">
+              <h3>Loan Amount</h3>
+              <p class="amount">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</p>
+              <small>Total loan amount taken</small>
+            </div>
+          </div>
+
+          <div class="detail-card balance-card">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <h3>Net Balance</h3>
+              <p class="amount" [class.positive]="selectedAccount.fund_amount > selectedAccount.loan_amount" [class.negative]="selectedAccount.fund_amount < selectedAccount.loan_amount">
+                ₹{{ (selectedAccount.fund_amount - selectedAccount.loan_amount) | number:'1.2-2' }}
+              </p>
+              <small>Fund amount minus loan amount</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-panel">
+          <div class="info-icon">ℹ️</div>
+          <div>
+            <p><strong>About Loan Details:</strong></p>
+            <ul>
+              <li><strong>Fund Amount:</strong> The total amount contributed by the member to the fund</li>
+              <li><strong>Loan Amount:</strong> The total amount borrowed by the member from the fund</li>
+              <li><strong>Net Balance:</strong> Positive means member has more funds than loans, negative means more loans than funds</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div *ngIf="showEditModal && selectedAccount" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h2>Update Loan Details</h2>
+          <p class="modal-subtitle">{{ selectedAccount.name }} ({{ selectedAccount.account }})</p>
+        </div>
+        <button class="close-button" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveLoanDetails()">
+          <div class="form-group">
+            <label for="fundAmount">Fund Amount (₹) *</label>
+            <input
+              type="number"
+              id="fundAmount"
+              [(ngModel)]="editedFundAmount"
+              name="fundAmount"
+              class="form-control"
+              step="0.01"
+              min="0"
+              required
+            />
+            <small class="form-hint">Total amount contributed to the fund</small>
+          </div>
+
+          <div class="form-group">
+            <label for="loanAmount">Loan Amount (₹) *</label>
+            <input
+              type="number"
+              id="loanAmount"
+              [(ngModel)]="editedLoanAmount"
+              name="loanAmount"
+              class="form-control"
+              step="0.01"
+              min="0"
+              required
+            />
+            <small class="form-hint">Total loan amount taken from the fund</small>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="summary-label">Net Balance:</span>
+              <span class="summary-value" [class.positive]="editedFundAmount > editedLoanAmount" [class.negative]="editedFundAmount < editedLoanAmount">
+                ₹{{ (editedFundAmount - editedLoanAmount) | number:'1.2-2' }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="saveSuccess" class="success-message">
+            ✅ Loan details updated successfully!
+          </div>
+
+          <div *ngIf="saveError" class="error-message">
+            ❌ {{ saveError }}
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeModal()" class="btn-cancel">Cancel</button>
+        <button type="button" (click)="saveLoanDetails()" [disabled]="saving" class="btn-save">
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

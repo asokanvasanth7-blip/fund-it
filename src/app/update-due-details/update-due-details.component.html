@@ -1,0 +1,233 @@
+<div class="update-due-container">
+  <header class="page-header">
+    <h1>Update Due Details</h1>
+    <p class="subtitle">Modify due schedule information (dates, amounts, interest)</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading accounts...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button (click)="loadAccounts()" class="retry-button">Retry</button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="content-layout">
+    <!-- Accounts List -->
+    <div class="accounts-sidebar">
+      <h3>Select Account</h3>
+      <div class="accounts-list">
+        <div
+          *ngFor="let account of accounts"
+          class="account-card"
+          [class.selected]="selectedAccount?.account === account.account"
+          (click)="selectAccount(account)">
+          <div class="account-id">{{ account.account }}</div>
+          <div class="account-name">{{ account.name }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Due Payments List -->
+    <div class="payments-section">
+      <div *ngIf="!selectedAccount" class="empty-selection">
+        <p>👈 Select an account to view and update due details</p>
+      </div>
+
+      <div *ngIf="selectedAccount">
+        <div class="account-info">
+          <h2>{{ selectedAccount.name }}</h2>
+          <p class="account-subtitle">Account: {{ selectedAccount.account }}</p>
+
+          <!-- JSON Import/Export Actions -->
+          <div class="json-actions">
+            <button (click)="exportDuePaymentsJSON()" class="json-btn export-btn" title="Download due payments as JSON">
+              📥 Export JSON
+            </button>
+            <button (click)="copyDuePaymentsJSON()" class="json-btn copy-btn" title="Copy JSON to clipboard">
+              📋 Copy JSON
+            </button>
+            <label class="json-btn import-btn" title="Import due payments from JSON file">
+              📤 Import JSON
+              <input
+                type="file"
+                accept=".json"
+                (change)="onFileSelected($event)"
+                style="display: none;">
+            </label>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="due-table">
+            <thead>
+              <tr>
+                <th>Due No.</th>
+                <th>Due Date</th>
+                <th>Due Amount</th>
+                <th>Loan Interest</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payment of selectedAccount.due_payments">
+                <td class="center">{{ payment.due_no }}</td>
+                <td>{{ payment.due_date }}</td>
+                <td class="amount">₹{{ payment.due_amount | number:'1.2-2' }}</td>
+                <td class="amount">₹{{ payment.loan_interest | number:'1.2-2' }}</td>
+                <td class="amount total">₹{{ payment.total | number:'1.2-2' }}</td>
+                <td class="center">
+                  <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
+                    {{ payment.payment_status }}
+                  </span>
+                </td>
+                <td class="center">
+                  <button (click)="editPayment(payment)" class="edit-btn">
+                    ✏️ Edit
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div *ngIf="showEditModal && editedPayment" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Edit Due Details - Due #{{ editedPayment.due_no }}</h2>
+        <button class="close-button" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveDueDetails()">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="due_date">Due Date</label>
+              <input
+                type="text"
+                id="due_date"
+                [(ngModel)]="editedPayment.due_date"
+                name="due_date"
+                class="form-control"
+                placeholder="DD MMM YYYY">
+            </div>
+
+            <div class="form-group">
+              <label for="due_no">Due Number</label>
+              <input
+                type="number"
+                id="due_no"
+                [(ngModel)]="editedPayment.due_no"
+                name="due_no"
+                class="form-control"
+                readonly>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="due_amount">Due Amount (₹)</label>
+              <input
+                type="number"
+                id="due_amount"
+                [(ngModel)]="editedPayment.due_amount"
+                name="due_amount"
+                (ngModelChange)="calculateTotal()"
+                class="form-control"
+                step="0.01"
+                min="0">
+            </div>
+
+            <div class="form-group">
+              <label for="loan_interest">Loan Interest (₹)</label>
+              <input
+                type="number"
+                id="loan_interest"
+                [(ngModel)]="editedPayment.loan_interest"
+                name="loan_interest"
+                (ngModelChange)="calculateTotal()"
+                class="form-control"
+                step="0.01"
+                min="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="total">Total Amount (₹)</label>
+              <input
+                type="number"
+                id="total"
+                [(ngModel)]="editedPayment.total"
+                name="total"
+                class="form-control"
+                step="0.01"
+                readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="payment_status">Payment Status</label>
+              <select
+                id="payment_status"
+                [(ngModel)]="editedPayment.payment_status"
+                name="payment_status"
+                class="form-control">
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="partial">Partial</option>
+                <option value="overdue">Overdue</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Apply to All Dues Checkbox -->
+          <div class="apply-all-container">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="applyToAllDues"
+                name="applyToAllDues"
+                class="checkbox-input"
+              />
+              <span class="checkbox-text">
+                <strong>Apply to All Dues</strong>
+                <small>Update due amount and loan interest for all 24 monthly payments</small>
+              </span>
+            </label>
+          </div>
+
+          <div class="info-box">
+            <p><strong>Note:</strong> This form only updates due schedule information. To record payments, use the Payment Collection page.</p>
+          </div>
+
+          <div *ngIf="saveSuccess" class="success-message">
+            ✅ Due details updated successfully!
+          </div>
+
+          <div *ngIf="saveError" class="error-message">
+            ❌ {{ saveError }}
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeModal()" class="btn-cancel">Cancel</button>
+        <button type="button" (click)="saveDueDetails()" [disabled]="saving" class="btn-save">
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

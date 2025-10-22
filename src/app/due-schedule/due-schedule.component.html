@@ -1,0 +1,83 @@
+<div class="due-schedule-container">
+  <header class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Due Schedule</h1>
+        <p class="subtitle">View your payment schedule and installment details</p>
+      </div>
+      <button *ngIf="!loading && !error && dueSchedules.length > 0"
+              (click)="exportToPDF()"
+              class="export-button">
+        <span class="icon">📄</span> Export to PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading due schedule...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button (click)="loadDueSchedules()" class="retry-button">Retry</button>
+  </div>
+
+  <!-- Schedule Table -->
+  <div *ngIf="!loading && !error && dueSchedules.length > 0" class="schedule-content">
+    <div class="table-container">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Due No.</th>
+            <th>Due Date</th>
+            <th class="amount-column">Due Amount</th>
+            <th class="amount-column">Due Interest</th>
+            <th class="amount-column">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let schedule of dueSchedules" class="schedule-row">
+            <td class="due-no">{{ schedule.due_no }}</td>
+            <td class="due-date">{{ schedule.due_date }}</td>
+            <td class="amount-column">₹{{ schedule.due_amount | number:'1.2-2' }}</td>
+            <td class="amount-column">₹{{ schedule.due_interest | number:'1.2-2' }}</td>
+            <td class="amount-column total">₹{{ schedule.total | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="summary-row">
+            <td colspan="2" class="summary-label">Total</td>
+            <td class="amount-column summary-amount">₹{{ getTotalDueAmount() | number:'1.2-2' }}</td>
+            <td class="amount-column summary-amount">₹{{ getTotalInterest() | number:'1.2-2' }}</td>
+            <td class="amount-column summary-amount total">₹{{ getGrandTotal() | number:'1.2-2' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <h3>Total Due Amount</h3>
+        <p class="amount">₹{{ getTotalDueAmount() | number:'1.2-2' }}</p>
+      </div>
+      <div class="summary-card">
+        <h3>Total Interest</h3>
+        <p class="amount">₹{{ getTotalInterest() | number:'1.2-2' }}</p>
+      </div>
+      <div class="summary-card highlight">
+        <h3>Grand Total</h3>
+        <p class="amount">₹{{ getGrandTotal() | number:'1.2-2' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && dueSchedules.length === 0" class="empty-state">
+    <p>No due schedules available at the moment.</p>
+  </div>
+</div>
+
