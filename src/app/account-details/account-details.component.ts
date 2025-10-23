@@ -25,6 +25,9 @@ export class AccountDetailsComponent implements OnInit {
   newAccountName: string = '';
   addingAccount: boolean = false;
   searchQuery: string = '';
+  isEditingName: boolean = false;
+  editedName: string = '';
+  updatingName: boolean = false;
 
   constructor(private firestoreService: FirestoreService) {}
 
@@ -91,11 +94,76 @@ export class AccountDetailsComponent implements OnInit {
   viewAccountDetails(account: AccountDetails) {
     this.selectedAccount = account;
     this.showPaymentDetails = true;
+    this.isEditingName = false;
+    this.editedName = '';
   }
 
   closeDetails() {
     this.showPaymentDetails = false;
     this.selectedAccount = null;
+    this.isEditingName = false;
+    this.editedName = '';
+  }
+
+  startEditName() {
+    if (this.selectedAccount) {
+      this.isEditingName = true;
+      this.editedName = this.selectedAccount.name;
+    }
+  }
+
+  cancelEditName() {
+    this.isEditingName = false;
+    this.editedName = '';
+  }
+
+  async saveAccountName() {
+    if (!this.selectedAccount || !this.editedName.trim()) {
+      alert('Please enter a valid name');
+      return;
+    }
+
+    if (this.editedName.trim() === this.selectedAccount.name) {
+      this.cancelEditName();
+      return;
+    }
+
+    try {
+      this.updatingName = true;
+
+      // Find the document ID for this account
+      const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
+      const accountDoc = accountsData.find((acc: any) => acc.account === this.selectedAccount!.account);
+
+      if (accountDoc && accountDoc.id) {
+        // Update the name in Firestore
+        await this.firestoreService.updateDocument('accountDetails', accountDoc.id, {
+          name: this.editedName.trim()
+        });
+
+        // Update local data
+        this.selectedAccount.name = this.editedName.trim();
+        const accountIndex = this.accounts.findIndex(acc => acc.account === this.selectedAccount!.account);
+        if (accountIndex !== -1) {
+          this.accounts[accountIndex].name = this.editedName.trim();
+        }
+        const filteredIndex = this.filteredAccounts.findIndex(acc => acc.account === this.selectedAccount!.account);
+        if (filteredIndex !== -1) {
+          this.filteredAccounts[filteredIndex].name = this.editedName.trim();
+        }
+
+        this.isEditingName = false;
+        this.editedName = '';
+        alert('Account name updated successfully!');
+      } else {
+        alert('Account not found in database');
+      }
+    } catch (error) {
+      console.error('Error updating account name:', error);
+      alert('Failed to update account name. Please try again.');
+    } finally {
+      this.updatingName = false;
+    }
   }
 
   getTotalFundAmount(): number {

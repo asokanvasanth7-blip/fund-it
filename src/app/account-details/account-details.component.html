@@ -136,7 +136,37 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div>
-          <h2>{{ selectedAccount.name }}</h2>
+          <div *ngIf="!isEditingName" class="account-name-section">
+            <h2>{{ selectedAccount.name }}</h2>
+            <button class="edit-name-button" (click)="startEditName()" title="Edit account name">
+              ✏️ Edit Name
+            </button>
+          </div>
+          <div *ngIf="isEditingName" class="edit-name-section">
+            <input
+              type="text"
+              [(ngModel)]="editedName"
+              class="edit-name-input"
+              placeholder="Enter new name"
+              [disabled]="updatingName"
+              (keyup.enter)="saveAccountName()"
+              (keyup.escape)="cancelEditName()"
+            />
+            <div class="edit-name-actions">
+              <button
+                class="save-name-button"
+                (click)="saveAccountName()"
+                [disabled]="updatingName || !editedName.trim()">
+                {{ updatingName ? 'Saving...' : '✓ Save' }}
+              </button>
+              <button
+                class="cancel-name-button"
+                (click)="cancelEditName()"
+                [disabled]="updatingName">
+                ✕ Cancel
+              </button>
+            </div>
+          </div>
           <p class="modal-subtitle">Account: {{ selectedAccount.account }}</p>
         </div>
         <button class="close-button" (click)="closeDetails()">✕</button>
