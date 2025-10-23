@@ -14,6 +14,7 @@ import { FirestoreService } from '../services/firestore.service';
 })
 export class UpdateDueDetailsComponent implements OnInit {
   accounts: AccountDetailsList = [];
+  filteredAccounts: AccountDetailsList = [];
   loading: boolean = true;
   error: string | null = null;
   selectedAccount: AccountDetails | null = null;
@@ -23,6 +24,7 @@ export class UpdateDueDetailsComponent implements OnInit {
   saveSuccess: boolean = false;
   saveError: string | null = null;
   applyToAllDues: boolean = false;
+  searchTerm: string = '';
 
   // Form fields
   editedPayment: PaymentEntry | null = null;
@@ -46,6 +48,7 @@ export class UpdateDueDetailsComponent implements OnInit {
           .sort((a: AccountDetails, b: AccountDetails) =>
             a.account.localeCompare(b.account)
           );
+        this.filteredAccounts = [...this.accounts];
       } else {
         await this.loadMockData();
       }
@@ -62,8 +65,21 @@ export class UpdateDueDetailsComponent implements OnInit {
     try {
       const response = await fetch('/assets/account-details.mock.json');
       this.accounts = await response.json();
+      this.filteredAccounts = [...this.accounts];
     } catch (err) {
       console.error('Error loading mock data:', err);
+    }
+  }
+
+  filterAccounts() {
+    const search = this.searchTerm.toLowerCase().trim();
+    if (!search) {
+      this.filteredAccounts = [...this.accounts];
+    } else {
+      this.filteredAccounts = this.accounts.filter(account =>
+        account.account.toLowerCase().includes(search) ||
+        account.name.toLowerCase().includes(search)
+      );
     }
   }
 

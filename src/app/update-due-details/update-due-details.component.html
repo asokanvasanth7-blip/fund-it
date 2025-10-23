@@ -20,15 +20,36 @@
   <div *ngIf="!loading && !error" class="content-layout">
     <!-- Accounts List -->
     <div class="accounts-sidebar">
-      <h3>Select Account</h3>
+      <div class="sidebar-header">
+        <h3>Select Account</h3>
+        <span class="account-count">{{ filteredAccounts.length }}</span>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="filterAccounts()"
+          placeholder="Search by account or name..."
+          class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+
       <div class="accounts-list">
         <div
-          *ngFor="let account of accounts"
+          *ngFor="let account of filteredAccounts"
           class="account-card"
           [class.selected]="selectedAccount?.account === account.account"
           (click)="selectAccount(account)">
           <div class="account-id">{{ account.account }}</div>
           <div class="account-name">{{ account.name }}</div>
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="filteredAccounts.length === 0" class="no-results">
+          <p>No accounts found</p>
+          <small>Try a different search term</small>
         </div>
       </div>
     </div>
@@ -63,7 +84,8 @@
           </div>
         </div>
 
-        <div class="table-container">
+        <!-- Desktop Table View -->
+        <div class="table-container desktop-view">
           <table class="due-table">
             <thead>
               <tr>
@@ -96,6 +118,46 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="mobile-cards-container mobile-view">
+          <div *ngFor="let payment of selectedAccount.due_payments" class="due-card">
+            <div class="due-card-header">
+              <div class="due-number">Due #{{ payment.due_no }}</div>
+              <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
+                {{ payment.payment_status }}
+              </span>
+            </div>
+
+            <div class="due-card-body">
+              <div class="due-info-row">
+                <span class="due-label">📅 Due Date</span>
+                <span class="due-value">{{ payment.due_date }}</span>
+              </div>
+
+              <div class="due-info-row">
+                <span class="due-label">💵 Due Amount</span>
+                <span class="due-value amount-text">₹{{ payment.due_amount | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="due-info-row">
+                <span class="due-label">📈 Loan Interest</span>
+                <span class="due-value interest-text">₹{{ payment.loan_interest | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="due-info-row highlight-row">
+                <span class="due-label">💰 Total Amount</span>
+                <span class="due-value total-large">₹{{ payment.total | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <div class="due-card-footer">
+              <button (click)="editPayment(payment)" class="edit-btn-mobile">
+                ✏️ Edit Due Details
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

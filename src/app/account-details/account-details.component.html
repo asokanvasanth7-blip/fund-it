@@ -76,7 +76,7 @@
     </div>
   </div>
 
-  <!-- Accounts Table -->
+  <!-- Accounts Table (Desktop View) -->
   <div *ngIf="!loading && !error && filteredAccounts.length > 0" class="accounts-content">
     <div class="table-container">
       <table class="accounts-table">
@@ -93,17 +93,17 @@
         </thead>
         <tbody>
           <tr *ngFor="let account of filteredAccounts" class="account-row">
-            <td class="account-id">{{ account.account }}</td>
-            <td class="account-name">{{ account.name }}</td>
-            <td class="amount-column">₹{{ account.fund_amount | number:'1.2-2' }}</td>
-            <td class="amount-column">₹{{ account.loan_amount | number:'1.2-2' }}</td>
-            <td class="center-column">
+            <td class="account-id" data-label="Account ID:">{{ account.account }}</td>
+            <td class="account-name" data-label="Name:">{{ account.name }}</td>
+            <td class="amount-column" data-label="Fund Amount:">₹{{ account.fund_amount | number:'1.2-2' }}</td>
+            <td class="amount-column" data-label="Loan Amount:">₹{{ account.loan_amount | number:'1.2-2' }}</td>
+            <td class="center-column" data-label="Pending Payments:">
               <span class="badge badge-pending">{{ getPendingPaymentsCount(account) }}</span>
             </td>
-            <td class="center-column">
+            <td class="center-column" data-label="Paid Payments:">
               <span class="badge badge-paid">{{ getPaidPaymentsCount(account) }}</span>
             </td>
-            <td class="center-column">
+            <td class="center-column" data-label="Actions:">
               <div class="action-buttons">
                 <button (click)="viewAccountDetails(account)" class="view-button">
                   👁️ View Details
@@ -116,6 +116,47 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-cards-container">
+      <div *ngFor="let account of filteredAccounts" class="account-card">
+        <div class="card-header-row">
+          <div class="account-card-id">{{ account.account }}</div>
+          <div class="payment-badges">
+            <span class="badge badge-pending" title="Pending Payments">
+              ⏳ {{ getPendingPaymentsCount(account) }}
+            </span>
+            <span class="badge badge-paid" title="Paid Payments">
+              ✓ {{ getPaidPaymentsCount(account) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="account-card-name">{{ account.name }}</div>
+
+        <div class="card-amounts">
+          <div class="amount-item">
+            <span class="amount-label">💰 Fund Amount</span>
+            <span class="amount-value">₹{{ account.fund_amount | number:'1.2-2' }}</span>
+          </div>
+          <div class="amount-item">
+            <span class="amount-label">💳 Loan Amount</span>
+            <span class="amount-value loan-amount">₹{{ account.loan_amount | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button (click)="viewAccountDetails(account)" class="view-button-mobile">
+            <span class="btn-icon">👁️</span>
+            <span>View Details</span>
+          </button>
+          <button (click)="exportAccountToPDF(account)" class="export-button-mobile" title="Export account details to PDF">
+            <span class="btn-icon">📄</span>
+            <span>Export</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -216,19 +257,19 @@
             </thead>
             <tbody>
               <tr *ngFor="let payment of selectedAccount.due_payments">
-                <td class="center-column">{{ payment.due_no }}</td>
-                <td>{{ payment.due_date }}</td>
-                <td class="amount-column">₹{{ payment.due_amount | number:'1.2-2' }}</td>
-                <td class="amount-column">₹{{ payment.loan_interest | number:'1.2-2' }}</td>
-                <td class="amount-column">₹{{ payment.total | number:'1.2-2' }}</td>
-                <td class="amount-column">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
-                <td class="amount-column">₹{{ payment.balance_amount | number:'1.2-2' }}</td>
-                <td class="center-column">
+                <td class="center-column" data-label="Due No.">{{ payment.due_no }}</td>
+                <td data-label="Due Date">{{ payment.due_date }}</td>
+                <td class="amount-column" data-label="Due Amount">₹{{ payment.due_amount | number:'1.2-2' }}</td>
+                <td class="amount-column" data-label="Loan Interest">₹{{ payment.loan_interest | number:'1.2-2' }}</td>
+                <td class="amount-column" data-label="Total">₹{{ payment.total | number:'1.2-2' }}</td>
+                <td class="amount-column" data-label="Paid">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
+                <td class="amount-column" data-label="Balance">₹{{ payment.balance_amount | number:'1.2-2' }}</td>
+                <td class="center-column" data-label="Status">
                   <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
                     {{ payment.payment_status }}
                   </span>
                 </td>
-                <td class="center-column">
+                <td class="center-column" data-label="Receipt">
                   <button
                     *ngIf="payment.payment_status === 'paid' || payment.payment_status === 'partial'"
                     (click)="generatePaymentReceipt(payment, selectedAccount)"

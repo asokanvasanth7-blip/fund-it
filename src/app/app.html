@@ -6,7 +6,7 @@
     <div class="sidebar-header">
       <div class="logo-container">
         <span class="logo-icon">💰</span>
-        <span class="logo-text" *ngIf="!sidebarCollapsed">Fund<span style="color: #90EE90;">It</span></span>
+        <span class="logo-text" [hidden]="sidebarCollapsed && !isMobile">Fund<span style="color: #90EE90;">It</span></span>
       </div>
     </div>
 
@@ -16,43 +16,43 @@
         <li class="nav-item">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
             <span class="nav-icon">🏠</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Home</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Home</span>
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/account-details" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">👥</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Accounts</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Accounts</span>
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/payment-collection" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">💳</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Collect Payment</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Collect Payment</span>
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/update-due-details" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">✏️</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Update Due</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Update Due</span>
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/update-loan-details" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">💰</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Update Loan</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Update Loan</span>
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/due-schedule" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">📅</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Due Schedule</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Due Schedule</span>
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/upload" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">📤</span>
-            <span class="nav-text" *ngIf="!sidebarCollapsed">Upload Data</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Upload Data</span>
           </a>
         </li>
       </ul>
@@ -62,20 +62,20 @@
     <div class="sidebar-footer">
       <ng-container *ngIf="user$ | async as user; else notLoggedIn">
         <div class="user-section">
-          <div class="user-info" *ngIf="!sidebarCollapsed">
+          <div class="user-info" [hidden]="sidebarCollapsed && !isMobile">
             <span class="user-icon">👤</span>
             <span class="user-email">{{ user.email }}</span>
           </div>
           <button class="btn-logout" (click)="logout()" [title]="sidebarCollapsed ? user.email : ''">
-            <span *ngIf="!sidebarCollapsed">Logout</span>
-            <span *ngIf="sidebarCollapsed">🚪</span>
+            <span [hidden]="sidebarCollapsed && !isMobile">Logout</span>
+            <span [hidden]="!sidebarCollapsed || isMobile">🚪</span>
           </button>
         </div>
       </ng-container>
       <ng-template #notLoggedIn>
         <button class="btn-login" (click)="goToLogin()">
-          <span *ngIf="!sidebarCollapsed">Login / Sign Up</span>
-          <span *ngIf="sidebarCollapsed">🔑</span>
+          <span [hidden]="sidebarCollapsed && !isMobile">Login / Sign Up</span>
+          <span [hidden]="!sidebarCollapsed || isMobile">🔑</span>
         </button>
       </ng-template>
     </div>

@@ -94,43 +94,90 @@
           <p>✅ All payments are completed for this account!</p>
         </div>
 
-        <div *ngIf="getPendingPayments(selectedAccount).length > 0" class="table-container">
-          <table class="payments-table">
-            <thead>
-              <tr>
-                <th>Due No.</th>
-                <th>Due Date</th>
-                <th>Total Due</th>
-                <th>Paid Amount</th>
-                <th>Balance</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let payment of getPendingPayments(selectedAccount)">
-                <td class="center">{{ payment.due_no }}</td>
-                <td>{{ payment.due_date }}</td>
-                <td class="amount">₹{{ payment.total | number:'1.2-2' }}</td>
-                <td class="amount">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
-                <td class="amount balance">₹{{ getRemainingBalance(payment) | number:'1.2-2' }}</td>
-                <td class="center">
-                  <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
-                    {{ payment.payment_status }}
-                  </span>
-                </td>
-                <td class="center">
-                  <button
-                    (click)="openPaymentModal(payment)"
-                    class="collect-btn"
-                    [disabled]="!canCollectPayment(payment)"
-                    [title]="!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due'">
-                    💰 Collect Payment
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="getPendingPayments(selectedAccount).length > 0">
+          <!-- Desktop Table View -->
+          <div class="table-container desktop-view">
+            <table class="payments-table">
+              <thead>
+                <tr>
+                  <th>Due No.</th>
+                  <th>Due Date</th>
+                  <th>Total Due</th>
+                  <th>Paid Amount</th>
+                  <th>Balance</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of getPendingPayments(selectedAccount)">
+                  <td class="center">{{ payment.due_no }}</td>
+                  <td>{{ payment.due_date }}</td>
+                  <td class="amount">₹{{ payment.total | number:'1.2-2' }}</td>
+                  <td class="amount">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
+                  <td class="amount balance">₹{{ getRemainingBalance(payment) | number:'1.2-2' }}</td>
+                  <td class="center">
+                    <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
+                      {{ payment.payment_status }}
+                    </span>
+                  </td>
+                  <td class="center">
+                    <button
+                      (click)="openPaymentModal(payment)"
+                      class="collect-btn"
+                      [disabled]="!canCollectPayment(payment)"
+                      [title]="!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due'">
+                      💰 Collect Payment
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Card View -->
+          <div class="mobile-cards-container mobile-view">
+            <div *ngFor="let payment of getPendingPayments(selectedAccount)" class="payment-card">
+              <div class="payment-card-header">
+                <div class="payment-due-number">Due #{{ payment.due_no }}</div>
+                <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
+                  {{ payment.payment_status }}
+                </span>
+              </div>
+
+              <div class="payment-card-body">
+                <div class="payment-info-row">
+                  <span class="payment-label">📅 Due Date</span>
+                  <span class="payment-value">{{ payment.due_date }}</span>
+                </div>
+
+                <div class="payment-info-row">
+                  <span class="payment-label">💰 Total Due</span>
+                  <span class="payment-value amount-large">₹{{ payment.total | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="payment-info-row">
+                  <span class="payment-label">✅ Paid Amount</span>
+                  <span class="payment-value paid-color">₹{{ payment.paid_amount | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="payment-info-row highlight-row">
+                  <span class="payment-label">⚖️ Balance</span>
+                  <span class="payment-value balance-large">₹{{ getRemainingBalance(payment) | number:'1.2-2' }}</span>
+                </div>
+              </div>
+
+              <div class="payment-card-footer">
+                <button
+                  (click)="openPaymentModal(payment)"
+                  class="collect-btn-mobile"
+                  [disabled]="!canCollectPayment(payment)"
+                  [title]="!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due'">
+                  💰 Collect Payment
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
