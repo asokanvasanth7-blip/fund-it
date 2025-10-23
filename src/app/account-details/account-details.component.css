@@ -1,52 +1,37 @@
-/* Container */
-.account-details-container {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-}
+.account-details-container{padding:2rem;max-width:1400px;margin:0 auto;background:#f8f9fa;min-height:100vh}
+.page-header{margin-bottom:2rem}
+.header-content{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.page-header h1{font-size:2rem;color:#2c3e50;margin:0;font-weight:600}
+.subtitle{font-size:1rem;color:#6c757d;margin:.5rem 0 0}
 
-/* Header */
-.page-header {
-  margin-bottom: 2rem;
-}
-
-.header-content {
+/* Header Actions & Buttons */
+.header-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-.page-header h1 {
-  font-size: 2rem;
-  color: #2c3e50;
-  margin: 0;
-  font-weight: 600;
-}
-
-.subtitle {
-  font-size: 1rem;
-  color: #6c757d;
-  margin: 0.5rem 0 0 0;
-}
-
-/* Add Account Button */
-.add-account-button {
+.add-account-button,
+.export-all-button {
   padding: 0.75rem 1.5rem;
-  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-account-button {
+  background-color: #28a745;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.2s ease;
+}
+
+.export-all-button {
+  background-color: #3498db;
 }
 
 .add-account-button:hover {
@@ -55,35 +40,15 @@
   box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
 }
 
-.button-icon {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-/* Header Actions */
-.header-actions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-/* Export All Button */
-.export-all-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
 .export-all-button:hover {
   background-color: #2980b9;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+}
+
+.button-icon {
+  font-size: 1.25rem;
+  font-weight: bold;
 }
 
 /* Search Section */
@@ -98,18 +63,18 @@
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  padding: .75rem 2.5rem .75rem 1rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
-  background-color: white;
+  font-size: .95rem;
+  transition: all .2s;
+  background: white;
 }
 
 .search-input:focus {
   outline: none;
   border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  box-shadow: 0 0 0 3px rgba(52,152,219,.1);
 }
 
 .search-input::placeholder {
@@ -131,8 +96,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: background-color 0.2s;
+  font-size: .85rem;
+  transition: background .2s;
 }
 
 .clear-search-btn:hover {
@@ -140,16 +105,16 @@
 }
 
 .search-results {
-  margin-top: 0.5rem;
+  margin-top: .5rem;
 }
 
 .results-count {
-  font-size: 0.85rem;
+  font-size: .85rem;
   color: #3498db;
   font-weight: 500;
 }
 
-/* Loading State */
+/* Loading & Error States */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -161,7 +126,7 @@
 
 .spinner {
   border: 3px solid #ecf0f1;
-  border-top: 3px solid #3498db;
+  border-top-color: #3498db;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -170,11 +135,9 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Error State */
 .error-container {
   text-align: center;
   padding: 2rem;
@@ -183,22 +146,21 @@
 .error-message {
   color: #e74c3c;
   margin-bottom: 1rem;
-  font-size: 1rem;
 }
 
 .retry-button {
-  padding: 0.6rem 1.5rem;
-  background-color: #3498db;
+  padding: .6rem 1.5rem;
+  background: #3498db;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.2s;
+  font-size: .95rem;
+  transition: background .2s;
 }
 
 .retry-button:hover {
-  background-color: #2980b9;
+  background: #2980b9;
 }
 
 /* Summary Section */
@@ -213,41 +175,41 @@
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0,0,0,.08);
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all .2s;
   border-left: 4px solid #3498db;
 }
 
 .summary-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
 }
 
 .summary-card.highlight {
-  background-color: #3498db;
+  background: #3498db;
   color: white;
-  border-left: 4px solid #2980b9;
+  border-color: #2980b9;
 }
 
 .card-icon {
   font-size: 2.5rem;
-  opacity: 0.85;
+  opacity: .85;
 }
 
 .card-content h3 {
-  font-size: 0.85rem;
-  margin: 0 0 0.5rem 0;
+  font-size: .85rem;
+  margin: 0 0 .5rem;
   font-weight: 500;
   color: #6c757d;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 }
 
 .summary-card.highlight h3 {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255,255,255,.9);
 }
 
 .card-content .amount {
@@ -262,15 +224,12 @@
 }
 
 /* Table Styles */
-.accounts-content {
-  margin-top: 1.5rem;
-}
-
 .table-container {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0,0,0,.08);
   overflow: hidden;
+  margin-top: 1.5rem;
 }
 
 .accounts-table {
@@ -279,7 +238,7 @@
 }
 
 .accounts-table thead {
-  background-color: #34495e;
+  background: #34495e;
   color: white;
 }
 
@@ -287,9 +246,9 @@
   padding: 1rem;
   text-align: left;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: .9rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 }
 
 .accounts-table td {
@@ -299,11 +258,11 @@
 }
 
 .account-row {
-  transition: background-color 0.2s;
+  transition: background .2s;
 }
 
 .account-row:hover {
-  background-color: #f8f9fa;
+  background: #f8f9fa;
 }
 
 .account-id {
@@ -368,20 +327,21 @@
   background-color: #3498db;
 }
 
-.view-button:hover {
-  background-color: #2980b9;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
-}
-
 .export-button {
   background-color: #27ae60;
 }
 
+.view-button:hover {
+  background-color: #2980b9;
+}
+
 .export-button:hover {
   background-color: #229954;
+}
+
+.view-button:hover,
+.export-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
 }
 
 /* Empty State */
@@ -408,14 +368,11 @@
   text-decoration: underline;
 }
 
-/* Modal Styles */
+/* Modal */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  background: rgba(0,0,0,.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -432,12 +389,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,.3);
 }
 
 .modal-header {
   padding: 1.5rem 2rem;
-  background-color: #34495e;
+  background: #34495e;
   color: white;
   display: flex;
   justify-content: space-between;
@@ -451,13 +408,13 @@
 }
 
 .modal-subtitle {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.9rem;
-  opacity: 0.9;
+  margin: .5rem 0 0;
+  font-size: .9rem;
+  opacity: .9;
 }
 
 .close-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,.1);
   border: none;
   color: white;
   font-size: 1.5rem;
@@ -465,14 +422,14 @@
   height: 36px;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background .2s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,.2);
 }
 
 .modal-body {
@@ -495,15 +452,15 @@
 .summary-item {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: .5rem;
 }
 
 .summary-item .label {
-  font-size: 0.85rem;
+  font-size: .85rem;
   color: #6c757d;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 }
 
 .summary-item .value {
@@ -521,13 +478,13 @@
 }
 
 .section-title {
-  margin: 1.5rem 0 1rem 0;
+  margin: 1.5rem 0 1rem;
   color: #2c3e50;
   font-size: 1.25rem;
   font-weight: 600;
 }
 
-/* Payments Table in Modal */
+/* Payments Table */
 .payments-table-container {
   overflow-x: auto;
   border-radius: 8px;
@@ -537,84 +494,84 @@
 .payments-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: .9rem;
 }
 
 .payments-table thead {
-  background-color: #34495e;
+  background: #34495e;
   color: white;
 }
 
 .payments-table th {
-  padding: 0.75rem;
+  padding: .75rem;
   text-align: left;
   font-weight: 500;
-  font-size: 0.85rem;
+  font-size: .85rem;
 }
 
 .payments-table td {
-  padding: 0.75rem;
+  padding: .75rem;
   border-bottom: 1px solid #e9ecef;
 }
 
 .payments-table tbody tr:hover {
-  background-color: #f8f9fa;
+  background: #f8f9fa;
 }
 
 /* Status Badge */
 .status-badge {
   display: inline-block;
-  padding: 0.3rem 0.7rem;
+  padding: .3rem .7rem;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: .8rem;
   font-weight: 500;
   text-transform: capitalize;
 }
 
 .status-paid {
-  background-color: #d4edda;
+  background: #d4edda;
   color: #155724;
 }
 
 .status-pending {
-  background-color: #fff3cd;
+  background: #fff3cd;
   color: #856404;
 }
 
 .status-partial {
-  background-color: #d1ecf1;
+  background: #d1ecf1;
   color: #0c5460;
 }
 
 .status-overdue {
-  background-color: #f8d7da;
+  background: #f8d7da;
   color: #721c24;
 }
 
 /* Receipt Button */
 .receipt-btn {
-  padding: 0.4rem 0.8rem;
-  background-color: #3498db;
+  padding: .4rem .8rem;
+  background: #3498db;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
+  font-size: .85rem;
+  transition: all .2s;
   white-space: nowrap;
 }
 
 .receipt-btn:hover {
-  background-color: #2980b9;
+  background: #2980b9;
   transform: translateY(-1px);
 }
 
 .no-action {
   color: #adb5bd;
-  font-size: 0.9rem;
+  font-size: .9rem;
 }
 
-/* Modal Footer */
+/* Modal Footer & Forms */
 .modal-footer {
   padding: 1rem 2rem;
   background: #f8f9fa;
@@ -623,22 +580,6 @@
   justify-content: flex-end;
 }
 
-.btn-close {
-  padding: 0.6rem 1.5rem;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.2s;
-}
-
-.btn-close:hover {
-  background-color: #5a6268;
-}
-
-/* Add Account Form */
 .add-account-modal {
   max-width: 500px;
 }
@@ -649,24 +590,24 @@
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   font-weight: 500;
   color: #2c3e50;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
+  padding: .75rem;
   border: 1px solid #ced4da;
   border-radius: 5px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: border .2s;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  box-shadow: 0 0 0 3px rgba(52,152,219,.1);
 }
 
 .form-actions {
@@ -675,40 +616,40 @@
   justify-content: flex-end;
 }
 
-.btn-submit {
-  padding: 0.6rem 1.5rem;
-  background-color: #28a745;
+.btn-close,
+.btn-submit,
+.btn-cancel {
+  padding: .6rem 1.5rem;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.2s;
+  font-size: .95rem;
+  transition: background .2s;
+}
+
+.btn-close,
+.btn-cancel {
+  background: #6c757d;
+}
+
+.btn-submit {
+  background: #28a745;
+}
+
+.btn-close:hover,
+.btn-cancel:hover {
+  background: #5a6268;
 }
 
 .btn-submit:hover {
-  background-color: #218838;
+  background: #218838;
 }
 
 .btn-submit:disabled {
-  background-color: #6c757d;
+  background: #6c757d;
   cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.btn-cancel {
-  padding: 0.6rem 1.5rem;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.2s;
-}
-
-.btn-cancel:hover {
-  background-color: #5a6268;
+  opacity: .6;
 }
 
 /* Edit Name Section */
@@ -720,25 +661,6 @@
 
 .account-name-section h2 {
   margin: 0;
-}
-
-.edit-name-button {
-  padding: 0.5rem 1rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.edit-name-button:hover {
-  background-color: #2980b9;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
 }
 
 .edit-name-section {
@@ -755,7 +677,6 @@
   border-radius: 5px;
   width: 100%;
   max-width: 400px;
-  transition: all 0.2s;
 }
 
 .edit-name-input:focus {
@@ -775,9 +696,10 @@
   gap: 0.5rem;
 }
 
-.save-name-button {
+.edit-name-button,
+.save-name-button,
+.cancel-name-button {
   padding: 0.5rem 1rem;
-  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 5px;
@@ -786,39 +708,39 @@
   font-weight: 500;
   transition: all 0.2s;
   white-space: nowrap;
+}
+
+.edit-name-button {
+  background-color: #3498db;
+}
+
+.save-name-button {
+  background-color: #28a745;
+}
+
+.cancel-name-button {
+  background-color: #dc3545;
+}
+
+.edit-name-button:hover {
+  background-color: #2980b9;
 }
 
 .save-name-button:hover:not(:disabled) {
   background-color: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
-}
-
-.save-name-button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.cancel-name-button {
-  padding: 0.5rem 1rem;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  white-space: nowrap;
 }
 
 .cancel-name-button:hover:not(:disabled) {
   background-color: #c82333;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
 }
 
+.edit-name-button:hover,
+.save-name-button:hover:not(:disabled),
+.cancel-name-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.save-name-button:disabled,
 .cancel-name-button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
