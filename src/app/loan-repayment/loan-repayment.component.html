@@ -1,0 +1,206 @@
+<div class="loan-repayment-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>💰 Loan Repayment</h1>
+        <p class="subtitle">Process loan repayments and track outstanding balances</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading accounts...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="content-grid">
+    <!-- Left Panel - Account Selection -->
+    <div class="accounts-panel">
+      <div class="panel-header">
+        <h2>Select Account</h2>
+        <p class="panel-subtitle">{{ filteredAccounts.length }} accounts with outstanding loans</p>
+      </div>
+
+      <!-- Search Box -->
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="filterAccounts()"
+          placeholder="Search by account number or name..."
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredAccounts.length === 0" class="empty-state">
+        <span class="empty-icon">📭</span>
+        <p>No accounts with outstanding loans found</p>
+      </div>
+
+      <!-- Accounts List -->
+      <div class="accounts-list">
+        <div
+          *ngFor="let account of filteredAccounts"
+          class="account-card"
+          [class.selected]="selectedAccount?.account === account.account"
+          (click)="selectAccount(account)"
+        >
+          <div class="account-info">
+            <div class="account-number">{{ account.account }}</div>
+            <div class="account-name">{{ account.name }}</div>
+          </div>
+          <div class="loan-info">
+            <div class="loan-label">Outstanding Loan</div>
+            <div class="loan-amount">₹{{ account.loan_amount | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Repayment Form -->
+    <div class="repayment-panel">
+      <!-- No Selection State -->
+      <div *ngIf="!selectedAccount" class="no-selection">
+        <span class="no-selection-icon">👈</span>
+        <h3>Select an Account</h3>
+        <p>Choose an account from the list to process a loan repayment</p>
+      </div>
+
+      <!-- Repayment Form -->
+      <div *ngIf="selectedAccount" class="repayment-form">
+        <!-- Account Summary -->
+        <div class="account-summary">
+          <div class="summary-header">
+            <h3>{{ selectedAccount.account }} - {{ selectedAccount.name }}</h3>
+            <button class="btn-close" (click)="clearSelection()" [disabled]="processing">✕</button>
+          </div>
+
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Fund Amount</span>
+              <span class="summary-value">₹{{ selectedAccount.fund_amount | number:'1.0-0' }}</span>
+            </div>
+            <div class="summary-item highlight">
+              <span class="summary-label">Current Loan</span>
+              <span class="summary-value loan">₹{{ selectedAccount.loan_amount | number:'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repayment Form Fields -->
+        <div class="form-section">
+          <h4 class="form-title">Repayment Details</h4>
+
+          <!-- Repayment Amount -->
+          <div class="form-group">
+            <label for="repaymentAmount" class="form-label">
+              <span class="label-icon">💵</span>
+              Repayment Amount *
+            </label>
+            <div class="input-with-button">
+              <input
+                id="repaymentAmount"
+                type="number"
+                [(ngModel)]="repaymentAmount"
+                class="form-input"
+                placeholder="Enter amount"
+                [disabled]="processing"
+                min="0"
+                [max]="selectedAccount.loan_amount"
+              />
+              <button
+                type="button"
+                class="btn-quick-fill"
+                (click)="setFullRepayment()"
+                [disabled]="processing"
+                title="Full Repayment"
+              >
+                Full
+              </button>
+            </div>
+            <small class="input-hint">Maximum: ₹{{ selectedAccount.loan_amount | number:'1.0-0' }}</small>
+          </div>
+
+          <!-- Repayment Date -->
+          <div class="form-group">
+            <label for="repaymentDate" class="form-label">
+              <span class="label-icon">📅</span>
+              Repayment Date *
+            </label>
+            <input
+              id="repaymentDate"
+              type="date"
+              [(ngModel)]="repaymentDate"
+              class="form-input"
+              [disabled]="processing"
+            />
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label for="repaymentNotes" class="form-label">
+              <span class="label-icon">📝</span>
+              Notes (Optional)
+            </label>
+            <textarea
+              id="repaymentNotes"
+              [(ngModel)]="repaymentNotes"
+              class="form-textarea"
+              placeholder="Add any notes about this repayment..."
+              rows="3"
+              [disabled]="processing"
+            ></textarea>
+          </div>
+
+          <!-- Calculation Summary -->
+          <div class="calculation-box">
+            <div class="calc-row">
+              <span class="calc-label">Current Loan Amount:</span>
+              <span class="calc-value">₹{{ getOutstandingLoanAmount() | number:'1.0-0' }}</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Repayment Amount:</span>
+              <span class="calc-value repayment">- ₹{{ repaymentAmount || 0 | number:'1.0-0' }}</span>
+            </div>
+            <div class="calc-divider"></div>
+            <div class="calc-row total">
+              <span class="calc-label"><strong>New Loan Balance:</strong></span>
+              <span class="calc-value"><strong>₹{{ getNewLoanBalance() | number:'1.0-0' }}</strong></span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button
+              class="btn btn-secondary"
+              (click)="clearSelection()"
+              [disabled]="processing"
+            >
+              Cancel
+            </button>
+            <button
+              class="btn btn-primary"
+              (click)="processRepayment()"
+              [disabled]="processing || !repaymentAmount || repaymentAmount <= 0"
+            >
+              <span *ngIf="!processing">💳 Process Repayment</span>
+              <span *ngIf="processing">⏳ Processing...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

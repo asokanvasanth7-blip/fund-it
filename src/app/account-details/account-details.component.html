@@ -9,6 +9,9 @@
         <button class="export-all-button" (click)="exportAllAccountsToPDF()" *ngIf="filteredAccounts.length > 0">
           📊 Export PDF
         </button>
+        <button class="whatsapp-button" (click)="sendReportToWhatsApp()" *ngIf="filteredAccounts.length > 0">
+          📱 Send to WhatsApp
+        </button>
         <button class="json-export-button" (click)="exportAllAccountsJSON()" *ngIf="filteredAccounts.length > 0">
           📥 Export JSON
         </button>
@@ -91,6 +94,7 @@
           <tr>
             <th>Account ID</th>
             <th>Name</th>
+            <th>Mobile</th>
             <th class="amount-column">Fund Amount</th>
             <th class="amount-column">Loan Amount</th>
             <th class="center-column">Pending Payments</th>
@@ -102,6 +106,10 @@
           <tr *ngFor="let account of filteredAccounts" class="account-row">
             <td class="account-id" data-label="Account ID:">{{ account.account }}</td>
             <td class="account-name" data-label="Name:">{{ account.name }}</td>
+            <td data-label="Mobile:">
+              <span *ngIf="account.mobile" class="mobile-number">📱 {{ account.mobile }}</span>
+              <span *ngIf="!account.mobile" class="no-mobile">-</span>
+            </td>
             <td class="amount-column" data-label="Fund Amount:">₹{{ account.fund_amount | number:'1.2-2' }}</td>
             <td class="amount-column" data-label="Loan Amount:">₹{{ account.loan_amount | number:'1.2-2' }}</td>
             <td class="center-column" data-label="Pending Payments:">
@@ -138,6 +146,11 @@
               ✓ {{ getPaidPaymentsCount(account) }}
             </span>
           </div>
+        <div class="mobile-info" *ngIf="account.mobile">
+          <span class="mobile-label">📱</span>
+          <span class="mobile-value">{{ account.mobile }}</span>
+        </div>
+
         </div>
 
         <div class="account-card-name">{{ account.name }}</div>
@@ -216,6 +229,43 @@
             </div>
           </div>
           <p class="modal-subtitle">Account: {{ selectedAccount.account }}</p>
+
+          <!-- Mobile Number Section -->
+          <div class="mobile-number-section">
+            <div *ngIf="!isEditingMobile" class="mobile-display">
+              <span class="mobile-icon">📱</span>
+              <span class="mobile-text">{{ selectedAccount.mobile || 'No mobile number' }}</span>
+              <button class="edit-mobile-button" (click)="startEditMobile()" title="Edit mobile number">
+                ✏️ Edit Mobile
+              </button>
+            </div>
+            <div *ngIf="isEditingMobile" class="edit-mobile-section">
+              <input
+                type="tel"
+                [(ngModel)]="editedMobile"
+                class="edit-mobile-input"
+                placeholder="Enter 10-digit mobile number"
+                maxlength="10"
+                [disabled]="updatingMobile"
+                (keyup.enter)="saveAccountMobile()"
+                (keyup.escape)="cancelEditMobile()"
+              />
+              <div class="edit-mobile-actions">
+                <button
+                  class="save-mobile-button"
+                  (click)="saveAccountMobile()"
+                  [disabled]="updatingMobile">
+                  {{ updatingMobile ? 'Saving...' : '✓ Save' }}
+                </button>
+                <button
+                  class="cancel-mobile-button"
+                  (click)="cancelEditMobile()"
+                  [disabled]="updatingMobile">
+                  ✕ Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         <button class="close-button" (click)="closeDetails()">✕</button>
       </div>
@@ -260,6 +310,7 @@
                 <th>Balance</th>
                 <th>Status</th>
                 <th>Receipt</th>
+                <th>Remind</th>
               </tr>
             </thead>
             <tbody>
@@ -277,15 +328,38 @@
                   </span>
                 </td>
                 <td class="center-column" data-label="Receipt">
-                  <button
-                    *ngIf="payment.payment_status === 'paid' || payment.payment_status === 'partial'"
-                    (click)="generatePaymentReceipt(payment, selectedAccount)"
-                    class="receipt-btn"
-                    title="Generate Payment Receipt">
-                    📄 Receipt
-                  </button>
+                  <div *ngIf="payment.payment_status === 'paid' || payment.payment_status === 'partial'" class="receipt-actions">
+                    <button
+                      (click)="generatePaymentReceipt(payment, selectedAccount)"
+                      class="receipt-btn"
+                      title="Generate Payment Receipt">
+                      📄 PDF
+                    </button>
+                    <button
+                      (click)="sendPaymentReceiptWhatsApp(payment, selectedAccount)"
+                      class="receipt-whatsapp-btn"
+                      [disabled]="!selectedAccount.mobile"
+                      [title]="selectedAccount.mobile ? 'Send receipt via WhatsApp' : 'No mobile number available'">
+                      📱 Send
+                    </button>
+                  </div>
+
                   <span *ngIf="payment.payment_status === 'pending'" class="no-action">-</span>
                 </td>
+
+                <td class="center-column" data-label="Remind">
+                  <button
+                    *ngIf="payment.payment_status === 'pending' || payment.payment_status === 'partial' || payment.payment_status === 'overdue'"
+                    (click)="sendPaymentReminderWhatsApp(payment, selectedAccount)"
+                    class="whatsapp-remind-btn"
+                    [disabled]="!selectedAccount.mobile"
+                    [title]="selectedAccount.mobile ? 'Send WhatsApp reminder' : 'No mobile number available'">
+                    📱 WhatsApp
+                  </button>
+
+                  <span *ngIf="payment.payment_status === 'paid'" class="no-action">-</span>
+                </td>
+
               </tr>
             </tbody>
           </table>

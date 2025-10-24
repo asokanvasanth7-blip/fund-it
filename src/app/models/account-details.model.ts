@@ -45,6 +45,8 @@ export interface AccountDetails {
   /** The full name of the account holder */
   name: string;
 
+  mobile: string;
+
   /** The total fund amount contributed by the account holder */
   fund_amount: number;
 

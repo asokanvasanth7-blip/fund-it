@@ -8,6 +8,8 @@ import { AccountDetailsComponent } from './account-details/account-details.compo
 import { UpdateDueDetailsComponent } from './update-due-details/update-due-details.component';
 import { UpdateLoanDetailsComponent } from './update-loan-details/update-loan-details.component';
 import { PaymentCollectionComponent } from './payment-collection/payment-collection.component';
+import { DueReportComponent } from './due-report/due-report.component';
+import { LoanRepaymentComponent } from './loan-repayment/loan-repayment.component';
 import { authGuard } from './guards/auth.guard';
 import { publicGuard } from './guards/public.guard';
 
@@ -21,5 +23,7 @@ export const routes: Routes = [
   { path: 'update-due-details', component: UpdateDueDetailsComponent, canActivate: [authGuard] },
   { path: 'update-loan-details', component: UpdateLoanDetailsComponent, canActivate: [authGuard] },
   { path: 'payment-collection', component: PaymentCollectionComponent, canActivate: [authGuard] },
+  { path: 'due-report', component: DueReportComponent, canActivate: [authGuard] },
+  { path: 'loan-repayment', component: LoanRepaymentComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

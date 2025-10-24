@@ -1,0 +1,157 @@
+<div class="due-report-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>📊 Due Report</h1>
+        <p class="subtitle">Generate and export due payment reports</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Report Controls -->
+  <div class="report-controls">
+    <div class="control-group">
+      <label for="dueSelect" class="control-label">
+        <span class="label-icon">📅</span>
+        Select Due Number:
+      </label>
+      <select
+        id="dueSelect"
+        [(ngModel)]="selectedDue"
+        class="due-select"
+        [disabled]="loading">
+        <option [ngValue]="null">-- Select Due --</option>
+        <option *ngFor="let due of availableDues" [ngValue]="due">
+          Due {{ due }}
+        </option>
+      </select>
+    </div>
+
+    <div class="button-group">
+      <button
+        class="btn btn-primary"
+        (click)="generateReport()"
+        [disabled]="!selectedDue || loading">
+        <span *ngIf="!loading">🔍 Generate Report</span>
+        <span *ngIf="loading">⏳ Loading...</span>
+      </button>
+
+      <button
+        class="btn btn-success"
+        (click)="exportToPDF()"
+        [disabled]="!showReport || reportData.length === 0 || loading">
+        📄 Export to PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Generating report...</p>
+  </div>
+
+  <!-- Report Display -->
+  <div *ngIf="showReport && !loading" class="report-section">
+    <div class="report-header">
+      <h2>Due Report - Due No. {{ selectedDue }}</h2>
+      <p class="report-info">Total Records: {{ reportData.length }}</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="reportData.length === 0" class="empty-state">
+      <span class="empty-icon">📭</span>
+      <h3>No Data Found</h3>
+      <p>No payment records found for Due {{ selectedDue }}</p>
+    </div>
+
+    <!-- Report Table -->
+    <div *ngIf="reportData.length > 0" class="table-responsive">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>S.No.</th>
+            <th>Account Number</th>
+            <th>Name</th>
+            <th class="text-right">Due Amount</th>
+            <th class="text-right">Loan Interest</th>
+            <th class="text-right">Total Payable</th>
+            <th class="text-right">Paid Amount</th>
+            <th class="text-right">Balance Amount</th>
+            <th class="text-center">Payment Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of reportData">
+            <td class="text-center">{{ entry.sNo }}</td>
+            <td><strong>{{ entry.account }}</strong></td>
+            <td>{{ entry.name }}</td>
+            <td class="text-right">₹{{ entry.dueAmount | number:'1.0-0' }}</td>
+            <td class="text-right">₹{{ entry.loanInterest | number:'1.0-0' }}</td>
+            <td class="text-right amount-highlight">₹{{ entry.totalPayable | number:'1.0-0' }}</td>
+            <td class="text-right">₹{{ entry.paidAmount | number:'1.0-0' }}</td>
+            <td class="text-right">₹{{ entry.balanceAmount | number:'1.0-0' }}</td>
+            <td class="text-center">
+              <span [class]="'status-badge ' + getStatusClass(entry.paymentStatus)">
+                {{ entry.paymentStatus }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="3" class="text-right"><strong>TOTAL</strong></td>
+            <td class="text-right"><strong>₹{{ totalDueAmount | number:'1.0-0' }}</strong></td>
+            <td class="text-right"><strong>₹{{ totalLoanInterest | number:'1.0-0' }}</strong></td>
+            <td class="text-right"><strong>₹{{ totalPayableAmount | number:'1.0-0' }}</strong></td>
+            <td class="text-right"><strong>₹{{ totalPaidAmount | number:'1.0-0' }}</strong></td>
+            <td class="text-right"><strong>₹{{ totalBalanceAmount | number:'1.0-0' }}</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Summary Cards -->
+    <div *ngIf="reportData.length > 0" class="summary-section">
+      <h3 class="summary-title">Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-icon">💰</div>
+          <div class="summary-content">
+            <p class="summary-label">Total Payable</p>
+            <h4 class="summary-value">₹{{ totalPayableAmount | number:'1.0-0' }}</h4>
+          </div>
+        </div>
+
+        <div class="summary-card success">
+          <div class="summary-icon">✅</div>
+          <div class="summary-content">
+            <p class="summary-label">Total Paid</p>
+            <h4 class="summary-value">₹{{ totalPaidAmount | number:'1.0-0' }}</h4>
+          </div>
+        </div>
+
+        <div class="summary-card warning">
+          <div class="summary-icon">⚠️</div>
+          <div class="summary-content">
+            <p class="summary-label">Total Balance</p>
+            <h4 class="summary-value">₹{{ totalBalanceAmount | number:'1.0-0' }}</h4>
+          </div>
+        </div>
+
+        <div class="summary-card info">
+          <div class="summary-icon">📊</div>
+          <div class="summary-content">
+            <p class="summary-label">Collection Rate</p>
+            <h4 class="summary-value">
+              {{ totalPayableAmount > 0 ? ((totalPaidAmount / totalPayableAmount) * 100).toFixed(1) : 0 }}%
+            </h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

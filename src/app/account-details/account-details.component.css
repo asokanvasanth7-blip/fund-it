@@ -43,6 +43,7 @@
 
 .add-account-button,
 .export-all-button,
+.whatsapp-button,
 .json-export-button,
 .json-import-button {
   padding: 12px 24px;
@@ -78,6 +79,17 @@
 .export-all-button:hover {
   background: #e9ecef;
   transform: translateY(-2px);
+}
+
+.whatsapp-button {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  border: 2px solid #25D366;
+}
+
+.whatsapp-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
 }
 
 .json-export-button {
@@ -340,8 +352,30 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.3;
+}
+
+.mobile-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #f7fafc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.mobile-label {
+  font-size: 16px;
+}
+
+.mobile-value {
+  font-family: monospace;
+  font-weight: 500;
+  color: #2d3748;
+  letter-spacing: 0.5px;
 }
 
 .card-amounts {
@@ -466,6 +500,17 @@
 
 .account-name {
   font-weight: 500;
+}
+
+.mobile-number {
+  font-family: monospace;
+  font-size: 14px;
+  color: #2d3748;
+}
+
+.no-mobile {
+  color: #a0aec0;
+  font-style: italic;
 }
 
 .amount-column {
@@ -717,6 +762,105 @@
   background: #e9ecef;
 }
 
+/* Mobile Number Section */
+.mobile-number-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.mobile-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mobile-icon {
+  font-size: 18px;
+}
+
+.mobile-text {
+  font-size: 15px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.edit-mobile-button {
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.edit-mobile-button:hover {
+  background: #e9ecef;
+}
+
+.edit-mobile-section {
+  width: 100%;
+}
+
+.edit-mobile-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #48bb78;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.edit-mobile-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+}
+
+.edit-mobile-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save-mobile-button,
+.cancel-mobile-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.save-mobile-button {
+  background: #48bb78;
+  color: white;
+}
+
+.save-mobile-button:hover:not(:disabled) {
+  background: #38a169;
+}
+
+.save-mobile-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-mobile-button {
+  background: #f8f9fa;
+  color: var(--text-dark);
+}
+
+.cancel-mobile-button:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
 /* Modal Body */
 .modal-body {
   padding: 24px;
@@ -849,6 +993,65 @@
 .receipt-btn:hover {
   background: var(--primary-green-light);
   transform: scale(1.05);
+}
+
+/* Receipt Actions Container */
+.receipt-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Receipt WhatsApp Button */
+.receipt-whatsapp-btn {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.receipt-whatsapp-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
+}
+
+.receipt-whatsapp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #cbd5e0;
+}
+
+/* WhatsApp Remind Button */
+.whatsapp-remind-btn {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.whatsapp-remind-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-remind-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #cbd5e0;
 }
 
 .no-action {

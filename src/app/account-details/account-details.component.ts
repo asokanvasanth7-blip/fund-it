@@ -29,6 +29,9 @@ export class AccountDetailsComponent implements OnInit {
   isEditingName: boolean = false;
   editedName: string = '';
   updatingName: boolean = false;
+  isEditingMobile: boolean = false;
+  editedMobile: string = '';
+  updatingMobile: boolean = false;
 
   constructor(private firestoreService: FirestoreService) {}
 
@@ -281,6 +284,8 @@ export class AccountDetailsComponent implements OnInit {
 
   viewAccountDetails(account: AccountDetails) {
     this.selectedAccount = account;
+    this.isEditingMobile = false;
+    this.editedMobile = '';
     this.showPaymentDetails = true;
     this.isEditingName = false;
     this.editedName = '';
@@ -288,6 +293,8 @@ export class AccountDetailsComponent implements OnInit {
 
   closeDetails() {
     this.showPaymentDetails = false;
+    this.isEditingMobile = false;
+    this.editedMobile = '';
     this.selectedAccount = null;
     this.isEditingName = false;
     this.editedName = '';
@@ -303,6 +310,102 @@ export class AccountDetailsComponent implements OnInit {
   cancelEditName() {
     this.isEditingName = false;
     this.editedName = '';
+  }
+
+  startEditMobile() {
+    if (this.selectedAccount) {
+      this.isEditingMobile = true;
+      this.editedMobile = this.selectedAccount.mobile || '';
+    }
+  }
+
+  cancelEditMobile() {
+    this.isEditingMobile = false;
+    this.editedMobile = '';
+  }
+
+  async saveAccountMobile() {
+    if (!this.selectedAccount) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Account Selected',
+        text: 'Please select an account first',
+        confirmButtonColor: '#ffc107'
+      });
+      return;
+    }
+
+    // Validate mobile number (10 digits)
+    const mobilePattern = /^[0-9]{10}$/;
+    if (this.editedMobile.trim() && !mobilePattern.test(this.editedMobile.trim())) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Mobile Number',
+        text: 'Please enter a valid 10-digit mobile number',
+        confirmButtonColor: '#ffc107'
+      });
+      return;
+    }
+
+    if (this.editedMobile.trim() === this.selectedAccount.mobile) {
+      this.cancelEditMobile();
+      return;
+    }
+
+    try {
+      this.updatingMobile = true;
+
+      // Find the document ID for this account
+      const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
+      const accountDoc = accountsData.find((acc: any) => acc.account === this.selectedAccount!.account);
+
+      if (accountDoc && accountDoc.id) {
+        // Update the mobile in Firestore
+        await this.firestoreService.updateDocument('accountDetails', accountDoc.id, {
+          mobile: this.editedMobile.trim()
+        });
+
+        // Update local data
+        this.selectedAccount.mobile = this.editedMobile.trim();
+        const accountIndex = this.accounts.findIndex(acc => acc.account === this.selectedAccount!.account);
+        if (accountIndex !== -1) {
+          this.accounts[accountIndex].mobile = this.editedMobile.trim();
+        }
+        const filteredIndex = this.filteredAccounts.findIndex(acc => acc.account === this.selectedAccount!.account);
+        if (filteredIndex !== -1) {
+          this.filteredAccounts[filteredIndex].mobile = this.editedMobile.trim();
+        }
+
+        this.isEditingMobile = false;
+        this.editedMobile = '';
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Mobile number updated successfully!',
+          confirmButtonColor: '#28a745',
+          timer: 2000,
+          timerProgressBar: true
+        });
+      } else {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Not Found',
+          text: 'Account not found in database',
+          confirmButtonColor: '#dc3545'
+        });
+      }
+    } catch (error) {
+      console.error('Error updating mobile number:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: 'Failed to update mobile number. Please try again.',
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      this.updatingMobile = false;
+    }
   }
 
   async saveAccountName() {
@@ -500,6 +603,7 @@ export class AccountDetailsComponent implements OnInit {
       const newAccount: AccountDetails = {
         account: nextAccountNumber,
         name: this.newAccountName.trim(),
+        mobile: '',
         fund_amount: 0,
         loan_amount: 0,
         due_payments: this.generateDuePayments()
@@ -780,6 +884,333 @@ export class AccountDetailsComponent implements OnInit {
     const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
     const fileName = `Receipt_${account.account}_Due${payment.due_no}_${timestamp}.pdf`;
     doc.save(fileName);
+  }
+
+  async sendReportToWhatsApp() {
+    if (this.filteredAccounts.length === 0) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Data',
+        text: 'No account data available to send',
+        confirmButtonColor: '#667eea'
+      });
+      return;
+    }
+
+    // Create summary message
+    const message = this.generateWhatsAppMessage();
+
+    // WhatsApp number (India format)
+    const phoneNumber = '917200005070'; // +91 7200005070
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // WhatsApp Web API URL
+    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Send Report via WhatsApp',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Recipient:</strong> +91 7200005070</p>
+          <p><strong>Total Accounts:</strong> ${this.filteredAccounts.length}</p>
+          <p><strong>Total Fund:</strong> ₹${this.getTotalFundAmount().toLocaleString('en-IN')}</p>
+          <p><strong>Total Loan:</strong> ₹${this.getTotalLoanAmount().toLocaleString('en-IN')}</p>
+          <br>
+          <p style="font-size: 13px; color: #666;">
+            <i class="fa fa-info-circle"></i> This will open WhatsApp Web with a pre-filled message.
+            You can review and edit before sending.
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#718096',
+      confirmButtonText: '<i class="fab fa-whatsapp"></i> Open WhatsApp',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+      // Open WhatsApp in new window
+      window.open(whatsappUrl, '_blank');
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'WhatsApp Opened!',
+        text: 'Please review and send the message from WhatsApp',
+        confirmButtonColor: '#25D366',
+        timer: 3000,
+        timerProgressBar: true
+      });
+    }
+  }
+
+  generateWhatsAppMessage(): string {
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    let message = `📊 *FUND IT - Account Details Report*\n`;
+    message += `📅 Date: ${today}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    message += `📈 *SUMMARY*\n`;
+    message += `Total Accounts: ${this.filteredAccounts.length}\n`;
+    message += `Total Fund Amount: ₹${this.getTotalFundAmount().toLocaleString('en-IN')}\n`;
+    message += `Total Loan Amount: ₹${this.getTotalLoanAmount().toLocaleString('en-IN')}\n\n`;
+
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `👥 *ACCOUNT DETAILS*\n\n`;
+
+    this.filteredAccounts.forEach((account, index) => {
+      const pendingCount = this.getPendingPaymentsCount(account);
+      const paidCount = this.getPaidPaymentsCount(account);
+
+      message += `${index + 1}. *${account.account}*\n`;
+      message += `   Name: ${account.name}\n`;
+      message += `   Fund: ₹${account.fund_amount.toLocaleString('en-IN')}\n`;
+      message += `   Loan: ₹${account.loan_amount.toLocaleString('en-IN')}\n`;
+      message += `   Payments: ${paidCount} paid, ${pendingCount} pending\n\n`;
+    });
+
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `Generated by FUND IT System\n`;
+    message += `📧 ramsatt@gmail.com\n`;
+    message += `📱 +91-8973576694`;
+
+    return message;
+  }
+
+  async sendPaymentReminderWhatsApp(payment: PaymentEntry, account: AccountDetails) {
+    if (!account.mobile) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Mobile Number',
+        text: 'This account does not have a mobile number. Please add one first.',
+        confirmButtonColor: '#667eea'
+      });
+      return;
+    }
+
+    // Generate reminder message
+    const message = this.generatePaymentReminderMessage(payment, account);
+
+    // Format mobile number for WhatsApp (remove leading 0 if present, add 91 country code)
+    let mobileNumber = account.mobile.trim();
+    if (mobileNumber.startsWith('0')) {
+      mobileNumber = mobileNumber.substring(1);
+    }
+    const whatsappNumber = `91${mobileNumber}`;
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // WhatsApp Web API URL
+    const whatsappUrl = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Send Payment Reminder',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Account:</strong> ${account.account}</p>
+          <p><strong>Name:</strong> ${account.name}</p>
+          <p><strong>Mobile:</strong> +91 ${account.mobile}</p>
+          <p><strong>Due No:</strong> ${payment.due_no}</p>
+          <p><strong>Due Date:</strong> ${payment.due_date}</p>
+          <p><strong>Amount Due:</strong> ₹${payment.balance_amount.toLocaleString('en-IN')}</p>
+          <br>
+          <p style="font-size: 13px; color: #666;">
+            <i class="fa fa-info-circle"></i> This will open WhatsApp with a pre-filled reminder message.
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#718096',
+      confirmButtonText: '📱 Send Reminder',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+      // Open WhatsApp in new window
+      window.open(whatsappUrl, '_blank');
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'WhatsApp Opened!',
+        text: 'Please send the reminder message from WhatsApp',
+        confirmButtonColor: '#25D366',
+        timer: 3000,
+        timerProgressBar: true
+      });
+    }
+  }
+
+  generatePaymentReminderMessage(payment: PaymentEntry, account: AccountDetails): string {
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    let message = `🔔 *AZHISUKKUDI AMAVAASAI FUND (2025 - 2027) - PAYMENT REMINDER*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    message += `Dear *${account.name}*,\n\n`;
+    message += `This is a friendly reminder for your upcoming payment:\n\n`;
+
+    message += `📋 *Payment Details*\n`;
+    message += `Account: *${account.account}*\n`;
+    message += `Due No: *${payment.due_no} of 24*\n`;
+    message += `Due Date: *${payment.due_date}*\n\n`;
+
+    message += `💰 *Amount Breakdown*\n`;
+    message += `Principal Amount: ₹${payment.due_amount.toLocaleString('en-IN')}\n`;
+    message += `Interest Amount: ₹${payment.loan_interest.toLocaleString('en-IN')}\n`;
+    message += `Total Payable: *₹${payment.total.toLocaleString('en-IN')}*\n`;
+
+    if (payment.paid_amount > 0) {
+      message += `\nAmount Paid: ₹${payment.paid_amount.toLocaleString('en-IN')}\n`;
+      message += `Balance Due: *₹${payment.balance_amount.toLocaleString('en-IN')}*\n`;
+    }
+
+    message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `Please make the payment at your earliest convenience.\n\n`;
+
+    message += `For any queries, please contact:\n`;
+    message += `📧 ramsatt@gmail.com\n`;
+    message += `📱 +91-8973576694\n\n`;
+
+    message += `Thank you!\n`;
+    message += `*Admin - Azhisukudi Amavasi Fund*`;
+
+    return message;
+  }
+
+  async sendPaymentReceiptWhatsApp(payment: PaymentEntry, account: AccountDetails) {
+    if (!account.mobile) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Mobile Number',
+        text: 'This account does not have a mobile number. Please add one first.',
+        confirmButtonColor: '#667eea'
+      });
+      return;
+    }
+
+    // Generate receipt message
+    const message = this.generatePaymentReceiptMessage(payment, account);
+
+    // Format mobile number for WhatsApp (remove leading 0 if present, add 91 country code)
+    let mobileNumber = account.mobile.trim();
+    if (mobileNumber.startsWith('0')) {
+      mobileNumber = mobileNumber.substring(1);
+    }
+    const whatsappNumber = `91${mobileNumber}`;
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // WhatsApp Web API URL
+    const whatsappUrl = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Send Payment Receipt',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Account:</strong> ${account.account}</p>
+          <p><strong>Name:</strong> ${account.name}</p>
+          <p><strong>Mobile:</strong> +91 ${account.mobile}</p>
+          <p><strong>Due No:</strong> ${payment.due_no}</p>
+          <p><strong>Amount Paid:</strong> ₹${payment.paid_amount.toLocaleString('en-IN')}</p>
+          <p><strong>Payment Status:</strong> ${payment.payment_status.toUpperCase()}</p>
+          <br>
+          <p style="font-size: 13px; color: #666;">
+            <i class="fa fa-info-circle"></i> This will open WhatsApp with the payment receipt details.
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#718096',
+      confirmButtonText: '📱 Send Receipt',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+      // Open WhatsApp in new window
+      window.open(whatsappUrl, '_blank');
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'WhatsApp Opened!',
+        text: 'Please send the receipt from WhatsApp',
+        confirmButtonColor: '#25D366',
+        timer: 3000,
+        timerProgressBar: true
+      });
+    }
+  }
+
+  generatePaymentReceiptMessage(payment: PaymentEntry, account: AccountDetails): string {
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const receiptNo = `RCP-${account.account}-${payment.due_no.toString().padStart(3, '0')}`;
+
+    let message = `🧾 *PAYMENT RECEIPT*\n`;
+    message += `*AZHISUKKUDI AMAVAASAI FUND (2025 - 2027)*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    message += `Receipt No: *${receiptNo}*\n`;
+    message += `Date: ${today}\n\n`;
+
+    message += `👤 *Account Information*\n`;
+    message += `Account: *${account.account}*\n`;
+    message += `Name: *${account.name}*\n\n`;
+
+    message += `📋 *Payment Details*\n`;
+    message += `Installment: *${payment.due_no} of 24*\n`;
+    message += `Due Date: ${payment.due_date}\n\n`;
+
+    message += `💰 *Amount Details*\n`;
+    message += `Principal Amount: ₹${payment.due_amount.toLocaleString('en-IN')}\n`;
+    message += `Interest Amount: ₹${payment.loan_interest.toLocaleString('en-IN')}\n`;
+    message += `Total Due: ₹${payment.total.toLocaleString('en-IN')}\n\n`;
+
+    message += `✅ *Payment Status*\n`;
+    message += `Amount Paid: *₹${payment.paid_amount.toLocaleString('en-IN')}*\n`;
+    message += `Balance Amount: ₹${payment.balance_amount.toLocaleString('en-IN')}\n`;
+    message += `Status: *${payment.payment_status.toUpperCase()}*\n\n`;
+
+    if (payment.payment_status === 'paid') {
+      message += `✨ Payment received and processed successfully!\n\n`;
+    } else if (payment.payment_status === 'partial') {
+      message += `⚠️ Partial payment received. Balance remaining: ₹${payment.balance_amount.toLocaleString('en-IN')}\n\n`;
+    }
+
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `Thank you for your payment!\n\n`;
+
+    message += `*AZHISUKKUDI AMAVAASAI FUND*\n`;
+    message += `📧 ramsatt@gmail.com\n`;
+    message += `📱 +91-8973576694\n\n`;
+
+    message += `_This is a computer-generated receipt._`;
+
+    return message;
   }
 
   exportAllAccountsToPDF() {
