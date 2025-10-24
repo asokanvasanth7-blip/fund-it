@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import { DataUploadComponent } from './data-upload/data-upload.component';
 import { DueScheduleComponent } from './due-schedule/due-schedule.component';
@@ -11,7 +12,8 @@ import { authGuard } from './guards/auth.guard';
 import { publicGuard } from './guards/public.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent, canActivate: [authGuard] },
+  { path: '', component: HomeComponent, canActivate: [publicGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
   { path: 'upload', component: DataUploadComponent, canActivate: [authGuard] },
   { path: 'due-schedule', component: DueScheduleComponent, canActivate: [authGuard] },

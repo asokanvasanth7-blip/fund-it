@@ -10,8 +10,8 @@ export const publicGuard = () => {
   return new Observable<boolean>((observer) => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        // User is logged in, redirect to home
-        router.navigate(['/']);
+        // User is logged in, redirect to dashboard
+        router.navigate(['/dashboard']);
         observer.next(false);
       } else {
         // User is not logged in, allow access to login page

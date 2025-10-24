@@ -7,8 +7,15 @@
       </div>
       <div class="header-actions">
         <button class="export-all-button" (click)="exportAllAccountsToPDF()" *ngIf="filteredAccounts.length > 0">
-          📊 Export All Accounts
+          📊 Export PDF
         </button>
+        <button class="json-export-button" (click)="exportAllAccountsJSON()" *ngIf="filteredAccounts.length > 0">
+          📥 Export JSON
+        </button>
+        <button class="json-import-button" (click)="importFileInput.click()">
+          📤 Import JSON
+        </button>
+        <input #importFileInput type="file" accept=".json" (change)="importAccountsJSON($event)" style="display: none;">
         <button class="add-account-button" (click)="openAddAccountForm()">
           <span class="button-icon">+</span> Add New Account
         </button>

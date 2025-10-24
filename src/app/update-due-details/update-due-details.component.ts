@@ -1,9 +1,9 @@
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountDetails, AccountDetailsList, PaymentEntry } from '../models/account-details.model';
 import { FirestoreService } from '../services/firestore.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-update-due-details',
@@ -89,11 +89,11 @@ export class UpdateDueDetailsComponent implements OnInit {
 
   editPayment(payment: PaymentEntry) {
     this.selectedPayment = payment;
-    this.editedPayment = { ...payment }; // Create a copy for editing
+    this.editedPayment = { ...payment };
     this.showEditModal = true;
     this.saveSuccess = false;
     this.saveError = null;
-    this.applyToAllDues = false; // Reset checkbox
+    this.applyToAllDues = false;
   }
 
   closeModal() {
@@ -114,14 +114,12 @@ export class UpdateDueDetailsComponent implements OnInit {
       this.saveError = null;
 
       if (this.applyToAllDues) {
-        // Apply changes to all dues
         this.selectedAccount.due_payments = this.selectedAccount.due_payments.map((payment) => {
           return {
             ...payment,
             due_amount: this.editedPayment!.due_amount,
             loan_interest: this.editedPayment!.loan_interest,
             total: this.editedPayment!.due_amount + this.editedPayment!.loan_interest,
-            // Keep original due_no and other payment-specific fields
             due_no: payment.due_no,
             due_date: payment.due_date,
             paid_amount: payment.paid_amount,
@@ -130,13 +128,11 @@ export class UpdateDueDetailsComponent implements OnInit {
           };
         });
       } else {
-        // Update only the selected payment
         const paymentIndex = this.selectedAccount.due_payments.findIndex(
           p => p.due_no === this.selectedPayment!.due_no
         );
 
         if (paymentIndex !== -1) {
-          // Update the payment in the local array
           this.selectedAccount.due_payments[paymentIndex] = { ...this.editedPayment };
         } else {
           this.saveError = 'Payment not found';
@@ -144,7 +140,6 @@ export class UpdateDueDetailsComponent implements OnInit {
         }
       }
 
-      // Update in Firestore
       const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
       const firestoreAccount = accountsData.find(
         (acc: any) => acc.account === this.selectedAccount!.account
@@ -159,8 +154,6 @@ export class UpdateDueDetailsComponent implements OnInit {
       }
 
       this.saveSuccess = true;
-
-      // Update the selected payment reference
       this.selectedPayment = { ...this.editedPayment };
 
       setTimeout(() => {
@@ -196,10 +189,14 @@ export class UpdateDueDetailsComponent implements OnInit {
     }
   }
 
-  // Export due payments to JSON file
   exportDuePaymentsJSON() {
     if (!this.selectedAccount) {
-      alert('Please select an account first');
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Account Selected',
+        text: 'Please select an account first',
+        confirmButtonColor: '#667eea'
+      });
       return;
     }
 
@@ -220,15 +217,19 @@ export class UpdateDueDetailsComponent implements OnInit {
     window.URL.revokeObjectURL(url);
   }
 
-  // Import due payments from JSON file
-  onFileSelected(event: any) {
+  async onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (!file) {
       return;
     }
 
     if (!this.selectedAccount) {
-      alert('Please select an account first');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Account Selected',
+        text: 'Please select an account first',
+        confirmButtonColor: '#667eea'
+      });
       event.target.value = '';
       return;
     }
@@ -238,28 +239,54 @@ export class UpdateDueDetailsComponent implements OnInit {
       try {
         const jsonData = JSON.parse(e.target.result);
 
-        // Validate the JSON structure
         if (!jsonData.due_payments || !Array.isArray(jsonData.due_payments)) {
-          alert('Invalid JSON format: due_payments array is required');
+          await Swal.fire({
+            icon: 'error',
+            title: 'Invalid JSON Format',
+            text: 'due_payments array is required',
+            confirmButtonColor: '#dc3545'
+          });
           event.target.value = '';
           return;
         }
 
-        // Validate each payment entry
         const invalidPayment = jsonData.due_payments.find((payment: any) => !this.validatePaymentEntry(payment));
         if (invalidPayment) {
-          alert(`Invalid payment entry found: ${JSON.stringify(invalidPayment)}`);
+          await Swal.fire({
+            icon: 'error',
+            title: 'Invalid Payment Entry',
+            text: 'One or more payment entries have invalid data',
+            confirmButtonColor: '#dc3545'
+          });
           event.target.value = '';
           return;
         }
 
-        // Confirm before importing
-        if (this.selectedAccount && confirm(`Import ${jsonData.due_payments.length} payment entries for account ${this.selectedAccount.account}?`)) {
-          await this.importDuePayments(jsonData.due_payments);
+        if (this.selectedAccount) {
+          const result = await Swal.fire({
+            icon: 'question',
+            title: 'Import Due Payments?',
+            html: `Import <strong>${jsonData.due_payments.length}</strong> payment entries for account <strong>${this.selectedAccount.account}</strong>?`,
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Import',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#667eea',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+          });
+
+          if (result.isConfirmed) {
+            await this.importDuePayments(jsonData.due_payments);
+          }
         }
       } catch (err: any) {
         console.error('Error importing JSON:', err);
-        alert(`Failed to import JSON: ${err.message}`);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Import Failed',
+          text: `Failed to import JSON: ${err.message}`,
+          confirmButtonColor: '#dc3545'
+        });
       } finally {
         event.target.value = '';
       }
@@ -267,7 +294,6 @@ export class UpdateDueDetailsComponent implements OnInit {
     reader.readAsText(file);
   }
 
-  // Validate payment entry structure
   private validatePaymentEntry(payment: any): boolean {
     return (
       typeof payment.due_no === 'number' &&
@@ -281,7 +307,6 @@ export class UpdateDueDetailsComponent implements OnInit {
     );
   }
 
-  // Import and save due payments
   private async importDuePayments(payments: PaymentEntry[]) {
     if (!this.selectedAccount) {
       return;
@@ -291,10 +316,8 @@ export class UpdateDueDetailsComponent implements OnInit {
       this.saving = true;
       this.saveError = null;
 
-      // Update local data
       this.selectedAccount.due_payments = payments;
 
-      // Update in Firestore
       const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
       const firestoreAccount = accountsData.find(
         (acc: any) => acc.account === this.selectedAccount!.account
@@ -308,20 +331,36 @@ export class UpdateDueDetailsComponent implements OnInit {
         );
       }
 
-      alert('Due payments imported successfully!');
+      await Swal.fire({
+        icon: 'success',
+        title: 'Import Successful!',
+        text: 'Due payments imported successfully!',
+        confirmButtonColor: '#28a745',
+        timer: 2000,
+        timerProgressBar: true
+      });
 
     } catch (err: any) {
       console.error('Error importing due payments:', err);
-      alert(`Failed to import due payments: ${err.message}`);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Import Failed',
+        text: `Failed to import due payments: ${err.message}`,
+        confirmButtonColor: '#dc3545'
+      });
     } finally {
       this.saving = false;
     }
   }
 
-  // Copy JSON to clipboard
   copyDuePaymentsJSON() {
     if (!this.selectedAccount) {
-      alert('Please select an account first');
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Account Selected',
+        text: 'Please select an account first',
+        confirmButtonColor: '#667eea'
+      });
       return;
     }
 
@@ -335,10 +374,23 @@ export class UpdateDueDetailsComponent implements OnInit {
     const jsonString = JSON.stringify(dataToExport, null, 2);
 
     navigator.clipboard.writeText(jsonString).then(() => {
-      alert('Due payments JSON copied to clipboard!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Copied!',
+        text: 'Due payments JSON copied to clipboard!',
+        confirmButtonColor: '#28a745',
+        timer: 2000,
+        timerProgressBar: true
+      });
     }).catch(err => {
       console.error('Failed to copy to clipboard:', err);
-      alert('Failed to copy to clipboard');
+      Swal.fire({
+        icon: 'error',
+        title: 'Copy Failed',
+        text: 'Failed to copy to clipboard',
+        confirmButtonColor: '#dc3545'
+      });
     });
   }
 }
+

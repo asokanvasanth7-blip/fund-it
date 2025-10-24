@@ -42,7 +42,9 @@
 }
 
 .add-account-button,
-.export-all-button {
+.export-all-button,
+.json-export-button,
+.json-import-button {
   padding: 12px 24px;
   border: none;
   border-radius: 12px;
@@ -76,6 +78,28 @@
 .export-all-button:hover {
   background: #e9ecef;
   transform: translateY(-2px);
+}
+
+.json-export-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: 2px solid #667eea;
+}
+
+.json-export-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.json-import-button {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: 2px solid #f093fb;
+}
+
+.json-import-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
 }
 
 .button-icon {
@@ -971,7 +995,9 @@
   }
 
   .add-account-button,
-  .export-all-button {
+  .export-all-button,
+  .json-export-button,
+  .json-import-button {
     width: 100%;
     justify-content: center;
     padding: 14px 20px;

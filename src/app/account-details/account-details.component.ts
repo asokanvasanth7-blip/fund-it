@@ -6,6 +6,7 @@ import { AccountDetails, AccountDetailsList, PaymentEntry } from '../models/acco
 import { FirestoreService } from '../services/firestore.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-account-details',
@@ -90,6 +91,193 @@ export class AccountDetailsComponent implements OnInit {
     this.filteredAccounts = [...this.accounts];
   }
 
+  // Export all accounts to JSON file
+  exportAllAccountsJSON() {
+    if (this.accounts.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Accounts',
+        text: 'No accounts to export',
+        confirmButtonColor: '#2D5016'
+      });
+      return;
+    }
+
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      totalAccounts: this.accounts.length,
+      totalFundAmount: this.getTotalFundAmount(),
+      totalLoanAmount: this.getTotalLoanAmount(),
+      accounts: this.accounts
+    };
+
+    const jsonString = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    link.download = `FundIT_AllAccounts_${timestamp}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Export Successful!',
+      text: `Successfully exported ${this.accounts.length} accounts to JSON file!`,
+      confirmButtonColor: '#28a745',
+      timer: 3000,
+      timerProgressBar: true
+    });
+  }
+
+  // Import accounts from JSON file
+  async importAccountsJSON(event: any) {
+    const file: File = event.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e: any) => {
+      try {
+        const jsonData = JSON.parse(e.target.result);
+
+        // Validate JSON structure
+        if (!jsonData.accounts || !Array.isArray(jsonData.accounts)) {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Invalid JSON Format',
+            text: '"accounts" array is required in the JSON file',
+            confirmButtonColor: '#dc3545'
+          });
+          event.target.value = '';
+          return;
+        }
+
+        // Validate each account entry
+        const invalidAccount = jsonData.accounts.find((acc: any) => !this.validateAccountEntry(acc));
+        if (invalidAccount) {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Invalid Account Entry',
+            text: 'Please check the JSON structure. One or more accounts have invalid data.',
+            confirmButtonColor: '#dc3545'
+          });
+          event.target.value = '';
+          return;
+        }
+
+        // Show confirmation
+        const result = await Swal.fire({
+          icon: 'warning',
+          title: 'Import Accounts?',
+          html: `
+            <p>This will import <strong>${jsonData.accounts.length}</strong> accounts.</p>
+            <p class="text-warning"><strong>Warning:</strong> This may overwrite existing accounts with the same account numbers.</p>
+          `,
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Import',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#6c757d',
+          reverseButtons: true
+        });
+
+        if (result.isConfirmed) {
+          await this.importAccountsData(jsonData.accounts);
+        }
+      } catch (err: any) {
+        console.error('Error importing JSON:', err);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Import Failed',
+          text: `Failed to import JSON: ${err.message}`,
+          confirmButtonColor: '#dc3545'
+        });
+      } finally {
+        event.target.value = '';
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // Validate account entry structure
+  private validateAccountEntry(account: any): boolean {
+    return (
+      typeof account.account === 'string' &&
+      typeof account.name === 'string' &&
+      typeof account.fund_amount === 'number' &&
+      typeof account.loan_amount === 'number' &&
+      Array.isArray(account.due_payments) &&
+      account.due_payments.every((payment: any) => this.validatePaymentEntry(payment))
+    );
+  }
+
+  // Validate payment entry structure
+  private validatePaymentEntry(payment: any): boolean {
+    return (
+      typeof payment.due_no === 'number' &&
+      typeof payment.due_date === 'string' &&
+      typeof payment.due_amount === 'number' &&
+      typeof payment.loan_interest === 'number' &&
+      typeof payment.total === 'number' &&
+      typeof payment.paid_amount === 'number' &&
+      typeof payment.balance_amount === 'number' &&
+      ['pending', 'paid', 'partial', 'overdue'].includes(payment.payment_status)
+    );
+  }
+
+  // Import and save accounts data
+  private async importAccountsData(accounts: AccountDetails[]) {
+    try {
+      this.loading = true;
+      let importedCount = 0;
+      let updatedCount = 0;
+
+      for (const account of accounts) {
+        // Check if account already exists
+        const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
+        const existingAccount = accountsData.find((acc: any) => acc.account === account.account);
+
+        if (existingAccount) {
+          // Update existing account
+          await this.firestoreService.updateDocument('accountDetails', existingAccount.id, account);
+          updatedCount++;
+        } else {
+          // Add new account
+          await this.firestoreService.addDocument('accountDetails', account);
+          importedCount++;
+        }
+      }
+
+      // Reload accounts
+      await this.loadAccounts();
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Import Completed!',
+        html: `
+          <p><strong>New accounts added:</strong> ${importedCount}</p>
+          <p><strong>Existing accounts updated:</strong> ${updatedCount}</p>
+          <p><strong>Total processed:</strong> ${accounts.length}</p>
+        `,
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'Great!'
+      });
+    } catch (err: any) {
+      console.error('Error importing accounts:', err);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Import Failed',
+        text: `Failed to import accounts: ${err.message}`,
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      this.loading = false;
+    }
+  }
 
   viewAccountDetails(account: AccountDetails) {
     this.selectedAccount = account;
@@ -119,7 +307,12 @@ export class AccountDetailsComponent implements OnInit {
 
   async saveAccountName() {
     if (!this.selectedAccount || !this.editedName.trim()) {
-      alert('Please enter a valid name');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Name',
+        text: 'Please enter a valid name',
+        confirmButtonColor: '#ffc107'
+      });
       return;
     }
 
@@ -154,13 +347,31 @@ export class AccountDetailsComponent implements OnInit {
 
         this.isEditingName = false;
         this.editedName = '';
-        alert('Account name updated successfully!');
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Account name updated successfully!',
+          confirmButtonColor: '#28a745',
+          timer: 2000,
+          timerProgressBar: true
+        });
       } else {
-        alert('Account not found in database');
+        await Swal.fire({
+          icon: 'error',
+          title: 'Not Found',
+          text: 'Account not found in database',
+          confirmButtonColor: '#dc3545'
+        });
       }
     } catch (error) {
       console.error('Error updating account name:', error);
-      alert('Failed to update account name. Please try again.');
+      await Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: 'Failed to update account name. Please try again.',
+        confirmButtonColor: '#dc3545'
+      });
     } finally {
       this.updatingName = false;
     }
@@ -272,7 +483,12 @@ export class AccountDetailsComponent implements OnInit {
 
   async addNewAccount() {
     if (!this.newAccountName.trim()) {
-      alert('Please enter account holder name');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please enter account holder name',
+        confirmButtonColor: '#ffc107'
+      });
       return;
     }
 
@@ -293,10 +509,27 @@ export class AccountDetailsComponent implements OnInit {
       await this.loadAccounts();
 
       this.closeAddAccountForm();
-      alert(`Account ${nextAccountNumber} created successfully for ${this.newAccountName}!`);
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Account Created!',
+        html: `
+          <p>Account <strong>${nextAccountNumber}</strong></p>
+          <p>successfully created for</p>
+          <p><strong>${this.newAccountName}</strong></p>
+        `,
+        confirmButtonColor: '#28a745',
+        timer: 3000,
+        timerProgressBar: true
+      });
     } catch (error) {
       console.error('Error adding new account:', error);
-      alert('Failed to add new account. Please try again.');
+      await Swal.fire({
+        icon: 'error',
+        title: 'Creation Failed',
+        text: 'Failed to add new account. Please try again.',
+        confirmButtonColor: '#dc3545'
+      });
     } finally {
       this.addingAccount = false;
     }

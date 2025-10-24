@@ -80,9 +80,14 @@
             <h2>{{ selectedAccount.name }}</h2>
             <p class="account-subtitle">Account: {{ selectedAccount.account }}</p>
           </div>
-          <button (click)="openEditModal()" class="edit-btn">
-            ✏️ Edit Loan Details
-          </button>
+          <div class="header-actions">
+            <button (click)="openRepaymentModal()" class="repayment-btn" [disabled]="selectedAccount.loan_amount <= 0">
+              💰 Loan Repayment
+            </button>
+            <button (click)="openEditModal()" class="edit-btn">
+              ✏️ Edit Loan Details
+            </button>
+          </div>
         </div>
 
         <div class="details-cards">
@@ -197,6 +202,101 @@
         <button type="button" (click)="closeModal()" class="btn-cancel">Cancel</button>
         <button type="button" (click)="saveLoanDetails()" [disabled]="saving" class="btn-save">
           {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loan Repayment Modal -->
+  <div *ngIf="showRepaymentModal && selectedAccount" class="modal-overlay" (click)="closeRepaymentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h2>Process Loan Repayment</h2>
+          <p class="modal-subtitle">{{ selectedAccount.name }} ({{ selectedAccount.account }})</p>
+        </div>
+        <button class="close-button" (click)="closeRepaymentModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="current-loan-info">
+          <div class="info-row">
+            <span class="info-label">Current Loan Balance:</span>
+            <span class="info-value-large">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <form (ngSubmit)="processLoanRepayment()">
+          <div class="form-group">
+            <label for="repaymentAmount">Repayment Amount (₹) *</label>
+            <input
+              type="number"
+              id="repaymentAmount"
+              [(ngModel)]="repaymentAmount"
+              name="repaymentAmount"
+              class="form-control"
+              step="0.01"
+              min="0.01"
+              [max]="selectedAccount.loan_amount"
+              required
+            />
+            <small class="form-hint">Enter the amount being repaid (max: ₹{{ selectedAccount.loan_amount | number:'1.2-2' }})</small>
+          </div>
+
+          <div class="form-group">
+            <label for="repaymentDate">Repayment Date *</label>
+            <input
+              type="date"
+              id="repaymentDate"
+              [(ngModel)]="repaymentDate"
+              name="repaymentDate"
+              class="form-control"
+              required
+            />
+            <small class="form-hint">Date when the repayment is made</small>
+          </div>
+
+          <div class="form-group">
+            <label for="repaymentNotes">Notes (Optional)</label>
+            <textarea
+              id="repaymentNotes"
+              [(ngModel)]="repaymentNotes"
+              name="repaymentNotes"
+              class="form-control"
+              rows="3"
+              placeholder="Add any notes about this repayment..."
+            ></textarea>
+          </div>
+
+          <div class="summary-box" *ngIf="repaymentAmount > 0">
+            <div class="summary-row">
+              <span class="summary-label">Current Loan:</span>
+              <span class="summary-value">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Repayment:</span>
+              <span class="summary-value repayment">- ₹{{ repaymentAmount | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row highlight">
+              <span class="summary-label"><strong>New Loan Balance:</strong></span>
+              <span class="summary-value"><strong>₹{{ (selectedAccount.loan_amount - repaymentAmount) | number:'1.2-2' }}</strong></span>
+            </div>
+          </div>
+
+          <div *ngIf="saveSuccess" class="success-message">
+            ✅ Loan repayment processed successfully!
+          </div>
+
+          <div *ngIf="saveError" class="error-message">
+            ❌ {{ saveError }}
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeRepaymentModal()" class="btn-cancel">Cancel</button>
+        <button type="button" (click)="processLoanRepayment()" [disabled]="saving || repaymentAmount <= 0" class="btn-save">
+          {{ saving ? 'Processing...' : 'Process Repayment' }}
         </button>
       </div>
     </div>
