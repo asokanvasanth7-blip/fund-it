@@ -1,19 +1,53 @@
 <div class="update-loan-container">
+  <!-- Professional Header -->
   <header class="page-header">
-    <h1>Update Loan Details</h1>
-    <p class="subtitle">Manage fund amounts and loan amounts for member accounts</p>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>Update Loan Details</h1>
+          <p class="subtitle">Manage and update loan amounts for accounts</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="badge-text">AZHISUKKUDI AMAVAASAI FUND</span>
+        <span class="badge-year">2025-2027</span>
+      </div>
+    </div>
   </header>
 
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Loading accounts...</p>
+    <div class="loading-content">
+      <div class="spinner-modern"></div>
+      <h3>Loading Accounts</h3>
+      <p>Please wait while we fetch account data...</p>
+    </div>
   </div>
 
   <!-- Error State -->
   <div *ngIf="error && !loading" class="error-container">
-    <p class="error-message">{{ error }}</p>
-    <button (click)="loadAccounts()" class="retry-button">Retry</button>
+    <div class="error-content">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <h3>Error Loading Data</h3>
+      <p class="error-message">{{ error }}</p>
+      <button (click)="loadAccounts()" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Retry
+      </button>
+    </div>
   </div>
 
   <!-- Main Content -->
@@ -21,7 +55,7 @@
     <!-- Accounts Sidebar -->
     <div class="accounts-sidebar">
       <div class="sidebar-header">
-        <h3>Accounts</h3>
+        <h3>Select Account</h3>
         <span class="account-count">{{ filteredAccounts.length }}</span>
       </div>
 
@@ -32,272 +66,239 @@
           class="search-input"
           [(ngModel)]="searchTerm"
           (ngModelChange)="filterAccounts()"
-          placeholder="Search by name or ID..."
+          placeholder="Search by name or account ID..."
         />
-        <span class="search-icon">🔍</span>
+        <div class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </div>
       </div>
 
+      <!-- Accounts List -->
       <div class="accounts-list">
         <div
           *ngFor="let account of filteredAccounts"
-          class="account-card"
+          class="account-card-modern"
           [class.selected]="selectedAccount?.account === account.account"
           (click)="selectAccount(account)">
-          <div class="card-header">
-            <div class="account-badge">{{ account.account }}</div>
-          </div>
-          <div class="account-name">{{ account.name }}</div>
-          <div class="card-footer">
-            <div class="info-item">
-              <span class="info-label">Fund:</span>
-              <span class="info-value">₹{{ account.fund_amount | number:'1.0-0' }}</span>
+
+          <!-- Profile Avatar -->
+          <div class="account-avatar">
+            <div class="avatar-circle" [style.background]="getAvatarColor(account.account)">
+              {{ getInitials(account.name) }}
             </div>
-            <div class="info-item">
-              <span class="info-label">Loan:</span>
-              <span class="info-value loan-value">₹{{ account.loan_amount | number:'1.0-0' }}</span>
+          </div>
+
+          <!-- Account Info -->
+          <div class="account-info-section">
+            <h4 class="account-name-modern">{{ account.name }}</h4>
+
+            <div class="account-contact">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>{{ account.account }}</span>
+            </div>
+
+            <div class="account-contact" *ngIf="account.mobile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <span>{{ account.mobile }}</span>
+            </div>
+          </div>
+
+          <!-- Loan Amount -->
+          <div class="account-status-section">
+            <span class="role-badge">{{ account.account }}</span>
+            <div class="pending-points">
+              <div class="points-value">{{ account.loan_amount | number:'1.0-0' }}</div>
+              <div class="points-label">Loan</div>
             </div>
           </div>
         </div>
 
         <!-- No Results Message -->
         <div *ngIf="filteredAccounts.length === 0" class="no-results">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
           <p>No accounts found</p>
           <small>Try a different search term</small>
         </div>
       </div>
     </div>
 
-    <!-- Account Details Section -->
-    <div class="details-section">
+    <!-- Update Form Section -->
+    <div class="update-section">
       <div *ngIf="!selectedAccount" class="empty-selection">
-        <div class="empty-icon">💰</div>
-        <p>Select an account to update loan details</p>
+        <div class="empty-illustration">
+          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <h3>Select an Account</h3>
+          <p>Choose an account from the left panel to update loan details</p>
+        </div>
       </div>
 
-      <div *ngIf="selectedAccount" class="account-details">
-        <div class="details-header">
-          <div>
-            <h2>{{ selectedAccount.name }}</h2>
-            <p class="account-subtitle">Account: {{ selectedAccount.account }}</p>
-          </div>
-          <div class="header-actions">
-            <button (click)="openRepaymentModal()" class="repayment-btn" [disabled]="selectedAccount.loan_amount <= 0">
-              💰 Loan Repayment
-            </button>
-            <button (click)="openEditModal()" class="edit-btn">
-              ✏️ Edit Loan Details
-            </button>
-          </div>
-        </div>
-
-        <div class="details-cards">
-          <div class="detail-card fund-card">
-            <div class="card-icon">💵</div>
-            <div class="card-content">
-              <h3>Fund Amount</h3>
-              <p class="amount">₹{{ selectedAccount.fund_amount | number:'1.2-2' }}</p>
-              <small>Total fund contributed by member</small>
+      <div *ngIf="selectedAccount" class="form-container">
+        <!-- Account Summary Card -->
+        <div class="account-summary-card">
+          <div class="summary-header">
+            <div class="summary-avatar">
+              <div class="avatar-large" [style.background]="getAvatarColor(selectedAccount.account)">
+                {{ getInitials(selectedAccount.name) }}
+              </div>
             </div>
-          </div>
-
-          <div class="detail-card loan-card">
-            <div class="card-icon">💳</div>
-            <div class="card-content">
-              <h3>Loan Amount</h3>
-              <p class="amount">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</p>
-              <small>Total loan amount taken</small>
-            </div>
-          </div>
-
-          <div class="detail-card balance-card">
-            <div class="card-icon">📊</div>
-            <div class="card-content">
-              <h3>Net Balance</h3>
-              <p class="amount" [class.positive]="selectedAccount.fund_amount > selectedAccount.loan_amount" [class.negative]="selectedAccount.fund_amount < selectedAccount.loan_amount">
-                ₹{{ (selectedAccount.fund_amount - selectedAccount.loan_amount) | number:'1.2-2' }}
+            <div class="summary-info">
+              <h2>{{ selectedAccount.name }}</h2>
+              <p class="account-id">Account ID: {{ selectedAccount.account }}</p>
+              <p class="mobile-info" *ngIf="selectedAccount.mobile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                {{ selectedAccount.mobile }}
               </p>
-              <small>Fund amount minus loan amount</small>
+            </div>
+          </div>
+
+          <div class="summary-stats">
+            <div class="stat-card">
+              <div class="stat-icon fund">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-label">Fund Amount</div>
+                <div class="stat-value fund-value">₹{{ selectedAccount.fund_amount | number:'1.0-0' }}</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon loan">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-label">Current Loan</div>
+                <div class="stat-value loan-value">₹{{ selectedAccount.loan_amount | number:'1.0-0' }}</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="info-panel">
-          <div class="info-icon">ℹ️</div>
-          <div>
-            <p><strong>About Loan Details:</strong></p>
-            <ul>
-              <li><strong>Fund Amount:</strong> The total amount contributed by the member to the fund</li>
-              <li><strong>Loan Amount:</strong> The total amount borrowed by the member from the fund</li>
-              <li><strong>Net Balance:</strong> Positive means member has more funds than loans, negative means more loans than funds</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Modal -->
-  <div *ngIf="showEditModal && selectedAccount" class="modal-overlay" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div>
-          <h2>Update Loan Details</h2>
-          <p class="modal-subtitle">{{ selectedAccount.name }} ({{ selectedAccount.account }})</p>
-        </div>
-        <button class="close-button" (click)="closeModal()">✕</button>
-      </div>
-
-      <div class="modal-body">
-        <form (ngSubmit)="saveLoanDetails()">
-          <div class="form-group">
-            <label for="fundAmount">Fund Amount (₹) *</label>
-            <input
-              type="number"
-              id="fundAmount"
-              [(ngModel)]="editedFundAmount"
-              name="fundAmount"
-              class="form-control"
-              step="0.01"
-              min="0"
-              required
-            />
-            <small class="form-hint">Total amount contributed to the fund</small>
+        <!-- Update Form -->
+        <div class="update-form-card">
+          <div class="form-header">
+            <h3>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Update Loan Amount
+            </h3>
           </div>
 
-          <div class="form-group">
-            <label for="loanAmount">Loan Amount (₹) *</label>
-            <input
-              type="number"
-              id="loanAmount"
-              [(ngModel)]="editedLoanAmount"
-              name="loanAmount"
-              class="form-control"
-              step="0.01"
-              min="0"
-              required
-            />
-            <small class="form-hint">Total loan amount taken from the fund</small>
-          </div>
-
-          <div class="summary-box">
-            <div class="summary-row">
-              <span class="summary-label">Net Balance:</span>
-              <span class="summary-value" [class.positive]="editedFundAmount > editedLoanAmount" [class.negative]="editedFundAmount < editedLoanAmount">
-                ₹{{ (editedFundAmount - editedLoanAmount) | number:'1.2-2' }}
-              </span>
+          <form class="loan-form" (ngSubmit)="updateLoanAmount()">
+            <div class="form-group">
+              <label for="newLoanAmount">
+                New Loan Amount (₹)
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="newLoanAmount"
+                  [(ngModel)]="newLoanAmount"
+                  name="newLoanAmount"
+                  class="form-control"
+                  min="0"
+                  step="0.01"
+                  required>
+              </div>
+              <small class="form-hint">
+                Current loan amount: ₹{{ selectedAccount.loan_amount | number:'1.0-0' }}
+              </small>
             </div>
-          </div>
 
-          <div *ngIf="saveSuccess" class="success-message">
-            ✅ Loan details updated successfully!
-          </div>
+            <div class="form-group">
+              <label for="updateReason">
+                Reason for Update
+                <span class="optional">(Optional)</span>
+              </label>
+              <textarea
+                id="updateReason"
+                [(ngModel)]="updateReason"
+                name="updateReason"
+                class="form-control"
+                rows="3"
+                placeholder="Enter the reason for updating the loan amount..."></textarea>
+            </div>
 
-          <div *ngIf="saveError" class="error-message">
-            ❌ {{ saveError }}
-          </div>
-        </form>
-      </div>
+            <!-- Change Preview -->
+            <div class="change-preview" *ngIf="newLoanAmount !== selectedAccount.loan_amount">
+              <div class="preview-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Change Preview
+              </div>
+              <div class="preview-content">
+                <div class="preview-row">
+                  <span class="preview-label">Current Amount:</span>
+                  <span class="preview-value">₹{{ selectedAccount.loan_amount | number:'1.0-0' }}</span>
+                </div>
+                <div class="preview-row">
+                  <span class="preview-label">New Amount:</span>
+                  <span class="preview-value">₹{{ newLoanAmount | number:'1.0-0' }}</span>
+                </div>
+                <div class="preview-row highlight">
+                  <span class="preview-label">Change:</span>
+                  <span class="preview-value" [class.increase]="newLoanAmount > selectedAccount.loan_amount" [class.decrease]="newLoanAmount < selectedAccount.loan_amount">
+                    {{ newLoanAmount > selectedAccount.loan_amount ? '+' : '' }}₹{{ (newLoanAmount - selectedAccount.loan_amount) | number:'1.0-0' }}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-      <div class="modal-footer">
-        <button type="button" (click)="closeModal()" class="btn-cancel">Cancel</button>
-        <button type="button" (click)="saveLoanDetails()" [disabled]="saving" class="btn-save">
-          {{ saving ? 'Saving...' : 'Save Changes' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loan Repayment Modal -->
-  <div *ngIf="showRepaymentModal && selectedAccount" class="modal-overlay" (click)="closeRepaymentModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div>
-          <h2>Process Loan Repayment</h2>
-          <p class="modal-subtitle">{{ selectedAccount.name }} ({{ selectedAccount.account }})</p>
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button
+                type="button"
+                (click)="resetForm()"
+                class="btn btn-secondary"
+                [disabled]="isUpdating">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+                Reset
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="isUpdating || newLoanAmount < 0 || newLoanAmount === selectedAccount.loan_amount">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!isUpdating">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="spinner-small" *ngIf="isUpdating"></span>
+                {{ isUpdating ? 'Updating...' : 'Update Loan Amount' }}
+              </button>
+            </div>
+          </form>
         </div>
-        <button class="close-button" (click)="closeRepaymentModal()">✕</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="current-loan-info">
-          <div class="info-row">
-            <span class="info-label">Current Loan Balance:</span>
-            <span class="info-value-large">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</span>
-          </div>
-        </div>
-
-        <form (ngSubmit)="processLoanRepayment()">
-          <div class="form-group">
-            <label for="repaymentAmount">Repayment Amount (₹) *</label>
-            <input
-              type="number"
-              id="repaymentAmount"
-              [(ngModel)]="repaymentAmount"
-              name="repaymentAmount"
-              class="form-control"
-              step="0.01"
-              min="0.01"
-              [max]="selectedAccount.loan_amount"
-              required
-            />
-            <small class="form-hint">Enter the amount being repaid (max: ₹{{ selectedAccount.loan_amount | number:'1.2-2' }})</small>
-          </div>
-
-          <div class="form-group">
-            <label for="repaymentDate">Repayment Date *</label>
-            <input
-              type="date"
-              id="repaymentDate"
-              [(ngModel)]="repaymentDate"
-              name="repaymentDate"
-              class="form-control"
-              required
-            />
-            <small class="form-hint">Date when the repayment is made</small>
-          </div>
-
-          <div class="form-group">
-            <label for="repaymentNotes">Notes (Optional)</label>
-            <textarea
-              id="repaymentNotes"
-              [(ngModel)]="repaymentNotes"
-              name="repaymentNotes"
-              class="form-control"
-              rows="3"
-              placeholder="Add any notes about this repayment..."
-            ></textarea>
-          </div>
-
-          <div class="summary-box" *ngIf="repaymentAmount > 0">
-            <div class="summary-row">
-              <span class="summary-label">Current Loan:</span>
-              <span class="summary-value">₹{{ selectedAccount.loan_amount | number:'1.2-2' }}</span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Repayment:</span>
-              <span class="summary-value repayment">- ₹{{ repaymentAmount | number:'1.2-2' }}</span>
-            </div>
-            <div class="summary-row highlight">
-              <span class="summary-label"><strong>New Loan Balance:</strong></span>
-              <span class="summary-value"><strong>₹{{ (selectedAccount.loan_amount - repaymentAmount) | number:'1.2-2' }}</strong></span>
-            </div>
-          </div>
-
-          <div *ngIf="saveSuccess" class="success-message">
-            ✅ Loan repayment processed successfully!
-          </div>
-
-          <div *ngIf="saveError" class="error-message">
-            ❌ {{ saveError }}
-          </div>
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" (click)="closeRepaymentModal()" class="btn-cancel">Cancel</button>
-        <button type="button" (click)="processLoanRepayment()" [disabled]="saving || repaymentAmount <= 0" class="btn-save">
-          {{ saving ? 'Processing...' : 'Process Repayment' }}
-        </button>
       </div>
     </div>
   </div>

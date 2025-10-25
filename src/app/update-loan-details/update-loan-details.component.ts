@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountDetails, AccountDetailsList } from '../models/account-details.model';
 import { FirestoreService } from '../services/firestore.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-update-loan-details',
@@ -17,21 +18,12 @@ export class UpdateLoanDetailsComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
   selectedAccount: AccountDetails | null = null;
-  showEditModal: boolean = false;
-  showRepaymentModal: boolean = false;
-  saving: boolean = false;
-  saveSuccess: boolean = false;
-  saveError: string | null = null;
   searchTerm: string = '';
 
   // Form fields
-  editedFundAmount: number = 0;
-  editedLoanAmount: number = 0;
-
-  // Repayment fields
-  repaymentAmount: number = 0;
-  repaymentDate: string = '';
-  repaymentNotes: string = '';
+  newLoanAmount: number = 0;
+  updateReason: string = '';
+  isUpdating: boolean = false;
 
   constructor(private firestoreService: FirestoreService) {}
 
@@ -89,197 +81,163 @@ export class UpdateLoanDetailsComponent implements OnInit {
 
   selectAccount(account: AccountDetails) {
     this.selectedAccount = account;
+    this.newLoanAmount = account.loan_amount;
+    this.updateReason = '';
   }
 
-  openEditModal() {
-    if (!this.selectedAccount) return;
-
-    this.editedFundAmount = this.selectedAccount.fund_amount;
-    this.editedLoanAmount = this.selectedAccount.loan_amount;
-    this.showEditModal = true;
-    this.saveSuccess = false;
-    this.saveError = null;
-  }
-
-  closeModal() {
-    this.showEditModal = false;
-    this.saveSuccess = false;
-    this.saveError = null;
-  }
-
-  openRepaymentModal() {
-    if (!this.selectedAccount) return;
-
-    this.repaymentAmount = 0;
-    this.repaymentNotes = '';
-    this.setTodayDate();
-    this.showRepaymentModal = true;
-    this.saveSuccess = false;
-    this.saveError = null;
-  }
-
-  closeRepaymentModal() {
-    this.showRepaymentModal = false;
-    this.repaymentAmount = 0;
-    this.repaymentNotes = '';
-    this.saveSuccess = false;
-    this.saveError = null;
-  }
-
-  setTodayDate() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    this.repaymentDate = `${year}-${month}-${day}`;
-  }
-
-  async processLoanRepayment() {
+  async updateLoanAmount() {
     if (!this.selectedAccount) {
       return;
     }
 
-    if (this.repaymentAmount <= 0) {
-      this.saveError = 'Repayment amount must be greater than zero';
+    if (this.newLoanAmount < 0) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Invalid Amount',
+        text: 'Loan amount cannot be negative',
+        confirmButtonColor: '#dc3545'
+      });
       return;
     }
 
-    if (this.repaymentAmount > this.selectedAccount.loan_amount) {
-      this.saveError = `Repayment amount cannot exceed current loan balance of ₹${this.selectedAccount.loan_amount.toFixed(2)}`;
+    if (this.newLoanAmount === this.selectedAccount.loan_amount) {
+      await Swal.fire({
+        icon: 'info',
+        title: 'No Change',
+        text: 'The loan amount is the same as the current value',
+        confirmButtonColor: '#667eea'
+      });
+      return;
+    }
+
+    // Confirmation dialog
+    const result = await Swal.fire({
+      title: 'Update Loan Amount?',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Account:</strong> ${this.selectedAccount.name} (${this.selectedAccount.account})</p>
+          <p><strong>Current Loan:</strong> ₹${this.selectedAccount.loan_amount.toLocaleString('en-IN')}</p>
+          <p><strong>New Loan:</strong> ₹${this.newLoanAmount.toLocaleString('en-IN')}</p>
+          <p><strong>Change:</strong>
+            <span style="color: ${this.newLoanAmount > this.selectedAccount.loan_amount ? '#dc3545' : '#28a745'}">
+              ${this.newLoanAmount > this.selectedAccount.loan_amount ? '+' : ''}₹${(this.newLoanAmount - this.selectedAccount.loan_amount).toLocaleString('en-IN')}
+            </span>
+          </p>
+          ${this.updateReason ? `<p><strong>Reason:</strong> ${this.updateReason}</p>` : ''}
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#667eea',
+      cancelButtonColor: '#718096',
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
     try {
-      this.saving = true;
-      this.saveError = null;
+      this.isUpdating = true;
 
-      // Calculate new loan amount after repayment
-      const newLoanAmount = this.selectedAccount.loan_amount - this.repaymentAmount;
-
-      // Calculate new total interest based on remaining loan
-      const newTotalInterest = (newLoanAmount / 100) * 3;
-
-
-      // Update loan interest for all pending dues
-      this.selectedAccount.due_payments = this.selectedAccount.due_payments.map(payment => {
-        if (payment.payment_status === 'pending') {
-          return {
-            ...payment,
-            loan_interest: newTotalInterest,
-            total: payment.due_amount + newTotalInterest,
-            balance_amount: payment.due_amount + newTotalInterest - payment.paid_amount
-          };
-        }
-        return payment;
-      });
-
-      // Update the loan amount
-      this.selectedAccount.loan_amount = newLoanAmount;
-
-      // Update in Firestore
+      // Find the account in Firestore
       const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
       const firestoreAccount = accountsData.find(
         (acc: any) => acc.account === this.selectedAccount!.account
       );
 
-      if (firestoreAccount) {
-        await this.firestoreService.updateDocument(
-          'accountDetails',
-          firestoreAccount.id,
-          {
-            loan_amount: newLoanAmount,
-            due_payments: this.selectedAccount.due_payments
-          }
-        );
+      if (!firestoreAccount) {
+        throw new Error('Account not found in database');
       }
 
-      // Log repayment transaction
-      console.log('Loan repayment processed:', {
-        account: this.selectedAccount.account,
-        name: this.selectedAccount.name,
-        repaymentAmount: this.repaymentAmount,
-        previousLoanAmount: this.selectedAccount.loan_amount + this.repaymentAmount,
-        newLoanAmount: newLoanAmount,
-        date: this.repaymentDate,
-        notes: this.repaymentNotes
+      // Update in Firestore
+      await this.firestoreService.updateDocument(
+        'accountDetails',
+        firestoreAccount.id,
+        { loan_amount: this.newLoanAmount }
+      );
+
+      // Update local data
+      this.selectedAccount.loan_amount = this.newLoanAmount;
+      const accountIndex = this.accounts.findIndex(
+        acc => acc.account === this.selectedAccount!.account
+      );
+      if (accountIndex !== -1) {
+        this.accounts[accountIndex].loan_amount = this.newLoanAmount;
+      }
+      const filteredIndex = this.filteredAccounts.findIndex(
+        acc => acc.account === this.selectedAccount!.account
+      );
+      if (filteredIndex !== -1) {
+        this.filteredAccounts[filteredIndex].loan_amount = this.newLoanAmount;
+      }
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Loan Amount Updated!',
+        text: `Successfully updated loan amount for ${this.selectedAccount.name}`,
+        confirmButtonColor: '#28a745',
+        timer: 3000,
+        timerProgressBar: true
       });
 
-      this.saveSuccess = true;
-
-      setTimeout(() => {
-        this.closeRepaymentModal();
-      }, 2000);
+      this.updateReason = '';
 
     } catch (err: any) {
-      console.error('Error processing loan repayment:', err);
-      this.saveError = err.message || 'Failed to process loan repayment. Please try again.';
+      console.error('Error updating loan amount:', err);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: err.message || 'Failed to update loan amount. Please try again.',
+        confirmButtonColor: '#dc3545'
+      });
     } finally {
-      this.saving = false;
+      this.isUpdating = false;
     }
   }
 
-  async saveLoanDetails() {
-    if (!this.selectedAccount) {
-      return;
+  resetForm() {
+    if (this.selectedAccount) {
+      this.newLoanAmount = this.selectedAccount.loan_amount;
+      this.updateReason = '';
+    }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '?';
+
+    const words = name.trim().split(' ');
+    if (words.length === 1) {
+      return words[0].substring(0, 2).toUpperCase();
     }
 
-    try {
-      this.saving = true;
-      this.saveError = null;
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  }
 
-      // Calculate total interest: (loan_amount / 100) * 3
-      const totalInterest = this.editedLoanAmount / 100 * 3;
+  getAvatarColor(accountId: string): string {
+    const colors = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+      'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)',
+      'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+      'linear-gradient(135deg, #f77062 0%, #fe5196 100%)',
+      'linear-gradient(135deg, #2af598 0%, #009efd 100%)',
+      'linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%)'
+    ];
 
-
-      // Update loan interest for all pending dues
-      this.selectedAccount.due_payments = this.selectedAccount.due_payments.map(payment => {
-        if (payment.payment_status === 'pending') {
-          // Update loan interest for pending dues
-          return {
-            ...payment,
-            loan_interest: totalInterest,
-            total: payment.due_amount + totalInterest,
-            balance_amount: payment.due_amount + totalInterest - payment.paid_amount
-          };
-        }
-        // Keep other payments unchanged
-        return payment;
-      });
-
-      // Update the local account
-      this.selectedAccount.fund_amount = this.editedFundAmount;
-      this.selectedAccount.loan_amount = this.editedLoanAmount;
-
-      // Update in Firestore
-      const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
-      const firestoreAccount = accountsData.find(
-        (acc: any) => acc.account === this.selectedAccount!.account
-      );
-
-      if (firestoreAccount) {
-        await this.firestoreService.updateDocument(
-          'accountDetails',
-          firestoreAccount.id,
-          {
-            fund_amount: this.editedFundAmount,
-            loan_amount: this.editedLoanAmount,
-            due_payments: this.selectedAccount.due_payments
-          }
-        );
-      }
-
-      this.saveSuccess = true;
-
-      setTimeout(() => {
-        this.closeModal();
-      }, 1500);
-
-    } catch (err: any) {
-      console.error('Error updating loan details:', err);
-      this.saveError = err.message || 'Failed to update loan details. Please try again.';
-    } finally {
-      this.saving = false;
+    let hash = 0;
+    for (let i = 0; i < accountId.length; i++) {
+      hash = accountId.charCodeAt(i) + ((hash << 5) - hash);
     }
+
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
   }
 }
 

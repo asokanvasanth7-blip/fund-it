@@ -145,159 +145,178 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-/* Compact Account Card - New Professional Design */
-.account-card {
+/* Modern Account Card - Matching Reference Design */
+.account-card-modern {
   background: #ffffff;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  padding: 1.25rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: visible;
-  min-height: 140px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.account-card::before {
+.account-card-modern:hover {
+  border-color: #667eea;
+  background-color: #f8f9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+.account-card-modern.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.account-card-modern.selected::before {
   content: '';
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px 0 0 16px;
 }
 
-.account-card:hover {
-  border-color: #28a745;
-  background-color: #f8fdf9;
-  transform: translateX(2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+/* Profile Avatar */
+.account-avatar {
+  flex-shrink: 0;
 }
 
-.account-card:hover::before {
-  transform: scaleY(1);
-}
-
-.account-card.selected {
-  border-color: #28a745;
-  background: linear-gradient(135deg, rgba(40, 167, 69, 0.95) 0%, rgba(32, 201, 151, 0.95) 100%);
-  color: white;
-  transform: translateX(4px);
-  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
-}
-
-.account-card.selected::before {
-  transform: scaleY(1);
-  background: white;
-}
-
-/* Card Header */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.account-badge {
-  background-color: #f8f9fa;
-  color: #495057;
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
-
-.account-card.selected .account-badge {
-  background-color: rgba(255, 255, 255, 0.25);
-  color: white;
-}
-
-.pending-indicator {
-  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-  color: white;
-  width: 24px;
-  height: 24px;
+.avatar-circle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 20px;
   font-weight: 700;
-  box-shadow: 0 2px 6px rgba(255, 193, 7, 0.4);
-}
-
-.account-card.selected .pending-indicator {
-  background: rgba(255, 255, 255, 0.3);
   color: white;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid white;
 }
 
-/* Account Name */
-.account-name {
-  font-size: 0.95rem;
-  font-weight: 600;
+/* Account Info Section */
+.account-info-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-name-modern {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 700;
   color: #2d3748;
-  margin-bottom: 0.75rem;
-  line-height: 1.4;
-  display: block;
-  word-wrap: break-word;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.account-card.selected .account-name {
+.account-card-modern.selected .account-name-modern {
+  color: #667eea;
+}
+
+.account-contact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #718096;
+  margin-bottom: 4px;
+}
+
+.account-contact svg {
+  flex-shrink: 0;
+  color: #a0aec0;
+}
+
+.account-card-modern.selected .account-contact {
+  color: #4a5568;
+}
+
+.account-card-modern.selected .account-contact svg {
+  color: #667eea;
+}
+
+/* Status Section */
+.account-status-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.role-badge {
+  background-color: #2d3748;
   color: white;
-}
-
-/* Card Footer */
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 0.75rem;
-  border-top: 1px solid #f0f0f0;
-  margin-top: auto;
-}
-
-.account-card.selected .card-footer {
-  border-top-color: rgba(255, 255, 255, 0.2);
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.info-label {
-  font-size: 0.8rem;
-  color: #6c757d;
-  font-weight: 600;
-}
-
-.account-card.selected .info-label {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.info-value {
-  font-size: 0.9rem;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: #28a745;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.account-card.selected .info-value {
-  color: white;
+.account-card-modern.selected .role-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.pending-points {
+  text-align: right;
+}
+
+.points-value {
+  font-size: 22px;
   font-weight: 800;
+  color: #2d3748;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.account-card-modern.selected .points-value {
+  color: #667eea;
+}
+
+.points-label {
+  font-size: 11px;
+  color: #718096;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.account-card-modern.selected .points-label {
+  color: #667eea;
+}
+
+/* Legacy styles - keeping for backward compatibility */
+.account-card {
+  display: none;
+}
+
+.card-header,
+.account-badge,
+.pending-indicator,
+.account-name,
+.card-footer,
+.info-item,
+.info-label,
+.info-value {
+  /* Legacy styles hidden */
 }
 
 /* No Results */

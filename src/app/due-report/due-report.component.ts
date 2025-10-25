@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -141,6 +140,14 @@ export class DueReportComponent implements OnInit {
     return 'status-pending';
   }
 
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
   exportToPDF() {
     if (!this.selectedDue || this.reportData.length === 0) {
       alert('No data to export');
@@ -148,89 +155,298 @@ export class DueReportComponent implements OnInit {
     }
 
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Add title
-    doc.setFontSize(18);
+    // Modern Color Palette (matching web interface)
+    const PRIMARY_PURPLE = [102, 126, 234] as [number, number, number]; // #667eea
+    const SECONDARY_PURPLE = [118, 75, 162] as [number, number, number]; // #764ba2
+    const DARK_TEXT = [45, 55, 72] as [number, number, number]; // #2d3748
+    const LIGHT_GRAY = [248, 249, 250] as [number, number, number]; // #f8f9fa
+    const SUCCESS_GREEN = [40, 167, 69] as [number, number, number]; // #28a745
+    const DANGER_RED = [220, 53, 69] as [number, number, number]; // #dc3545
+    const WARNING_ORANGE = [237, 137, 54] as [number, number, number]; // #ed8936
+
+    // Helper function to format currency
+    const formatCurrency = (amount: number): string => {
+      return amount.toLocaleString('en-IN');
+    };
+
+    // ============ MODERN GRADIENT HEADER ============
+    // Create gradient effect with overlapping rectangles
+    doc.setFillColor(...PRIMARY_PURPLE);
+    doc.rect(0, 0, pageWidth, 45, 'F');
+
+    // Decorative lighter purple overlay
+    doc.setFillColor(...SECONDARY_PURPLE);
+    doc.rect(0, 0, pageWidth / 2, 45, 'F');
+
+    // Top accent line
+    doc.setFillColor(102, 126, 234);
+    doc.rect(0, 0, pageWidth, 3, 'F');
+
+    // Header Title
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Due Report - Due No. ${this.selectedDue}`, 14, 20);
+    doc.text('DUE PAYMENT REPORT', pageWidth / 2, 18, { align: 'center' });
 
-    // Add date
+    // Organization Name
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text('AZHISUKKUDI AMAVAASAI FUND', pageWidth / 2, 26, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.text('2025 - 2027', pageWidth / 2, 32, { align: 'center' });
+
+    // Due Number Badge (right side)
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(255, 255, 255);
+    doc.roundedRect(pageWidth - 48, 36, 40, 8, 2, 2, 'FD');
+    doc.setTextColor(...PRIMARY_PURPLE);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`DUE #${this.selectedDue} OF 24`, pageWidth - 28, 41, { align: 'center' });
+
+    // ============ INFO SECTION ============
+    let yPos = 55;
+
+    // Generated date and account count
+    doc.setTextColor(...DARK_TEXT);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+
+    doc.text(`Generated: ${currentDate}`, 14, yPos);
+    doc.text(`Total Accounts: ${this.reportData.length}`, pageWidth - 14, yPos, { align: 'right' });
+
+    // ============ SUMMARY CARDS ============
+    yPos = 65;
+    const cardWidth = (pageWidth - 40) / 4;
+    const cardHeight = 22;
+    const cardGap = 4;
+
+    // Card 1: Total Payable
+    const card1X = 14;
+    doc.setFillColor(...PRIMARY_PURPLE);
+    doc.roundedRect(card1X, yPos, cardWidth, cardHeight, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('TOTAL PAYABLE', card1X + cardWidth / 2, yPos + 7, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(formatCurrency(this.totalPayableAmount), card1X + cardWidth / 2, yPos + 15, { align: 'center' });
+
+    // Card 2: Total Paid
+    const card2X = card1X + cardWidth + cardGap;
+    doc.setFillColor(...SUCCESS_GREEN);
+    doc.roundedRect(card2X, yPos, cardWidth, cardHeight, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('TOTAL PAID', card2X + cardWidth / 2, yPos + 7, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(formatCurrency(this.totalPaidAmount), card2X + cardWidth / 2, yPos + 15, { align: 'center' });
+
+    // Card 3: Total Balance
+    const card3X = card2X + cardWidth + cardGap;
+    doc.setFillColor(...DANGER_RED);
+    doc.roundedRect(card3X, yPos, cardWidth, cardHeight, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('TOTAL BALANCE', card3X + cardWidth / 2, yPos + 7, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(formatCurrency(this.totalBalanceAmount), card3X + cardWidth / 2, yPos + 15, { align: 'center' });
+
+    // Card 4: Collection Rate
+    const card4X = card3X + cardWidth + cardGap;
+    const collectionRate = this.totalPayableAmount > 0
+      ? ((this.totalPaidAmount / this.totalPayableAmount) * 100).toFixed(1)
+      : '0.0';
+    doc.setFillColor(23, 162, 184); // Info blue
+    doc.roundedRect(card4X, yPos, cardWidth, cardHeight, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('COLLECTION RATE', card4X + cardWidth / 2, yPos + 7, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${collectionRate}%`, card4X + cardWidth / 2, yPos + 15, { align: 'center' });
+
+    // ============ MODERN TABLE ============
+    yPos = 95;
+
+    // Section Title
+    doc.setTextColor(...DARK_TEXT);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Payment Details', 14, yPos);
+
+    // Underline
+    doc.setDrawColor(...PRIMARY_PURPLE);
+    doc.setLineWidth(0.8);
+    doc.line(14, yPos + 1, 55, yPos + 1);
 
     // Prepare table data
     const tableData = this.reportData.map(entry => [
       entry.sNo,
       entry.account,
       entry.name,
-      `${entry.dueAmount.toLocaleString('en-IN')}`,
-      `${entry.loanInterest.toLocaleString('en-IN')}`,
-      `${entry.totalPayable.toLocaleString('en-IN')}`,
-      `${entry.paidAmount.toLocaleString('en-IN')}`,
-      `${entry.balanceAmount.toLocaleString('en-IN')}`,
+      formatCurrency(entry.dueAmount),
+      formatCurrency(entry.loanInterest),
+      formatCurrency(entry.totalPayable),
+      formatCurrency(entry.paidAmount),
+      formatCurrency(entry.balanceAmount),
       entry.paymentStatus
     ]);
 
-    // Add totals row
-    tableData.push([
-      '',
-      '',
-      'TOTAL',
-      `${this.totalDueAmount.toLocaleString('en-IN')}`,
-      `${this.totalLoanInterest.toLocaleString('en-IN')}`,
-      `${this.totalPayableAmount.toLocaleString('en-IN')}`,
-      `${this.totalPaidAmount.toLocaleString('en-IN')}`,
-      `${this.totalBalanceAmount.toLocaleString('en-IN')}`,
-      ''
-    ]);
-
-    // Generate table
+    // Generate modern table
     autoTable(doc, {
-      startY: 35,
+      startY: yPos + 5,
       head: [[
-        'S.No.',
-        'Account No.',
+        '#',
+        'Account',
         'Name',
         'Due Amount',
-        'Loan Interest',
-        'Total Payable',
-        'Paid Amount',
-        'Balance Amount',
+        'Interest',
+        'Total',
+        'Paid',
+        'Balance',
         'Status'
       ]],
       body: tableData,
-      theme: 'grid',
+      foot: [[
+        '',
+        '',
+        'GRAND TOTAL',
+        formatCurrency(this.totalDueAmount),
+        formatCurrency(this.totalLoanInterest),
+        formatCurrency(this.totalPayableAmount),
+        formatCurrency(this.totalPaidAmount),
+        formatCurrency(this.totalBalanceAmount),
+        ''
+      ]],
+      theme: 'plain',
       styles: {
         fontSize: 8,
-        cellPadding: 2
+        cellPadding: 3,
+        lineColor: [226, 232, 240],
+        lineWidth: 0.1,
+        textColor: DARK_TEXT,
+        fontStyle: 'normal'
       },
       headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: 'bold'
+        fillColor: PRIMARY_PURPLE,
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 8,
+        halign: 'center',
+        cellPadding: 4
+      },
+      footStyles: {
+        fillColor: [248, 249, 255],
+        textColor: DARK_TEXT,
+        fontStyle: 'bold',
+        fontSize: 9,
+        lineWidth: 0.5,
+        lineColor: PRIMARY_PURPLE
       },
       columnStyles: {
-        0: { cellWidth: 12, halign: 'center' },
-        1: { cellWidth: 22 },
+        0: { cellWidth: 10, halign: 'center', fillColor: LIGHT_GRAY, fontStyle: 'bold' },
+        1: { cellWidth: 20, fontStyle: 'bold', textColor: PRIMARY_PURPLE },
         2: { cellWidth: 35 },
-        3: { cellWidth: 20, halign: 'right' },
-        4: { cellWidth: 20, halign: 'right' },
-        5: { cellWidth: 22, halign: 'right' },
-        6: { cellWidth: 20, halign: 'right' },
-        7: { cellWidth: 22, halign: 'right' },
-        8: { cellWidth: 18, halign: 'center' }
+        3: { cellWidth: 22, halign: 'right' },
+        4: { cellWidth: 20, halign: 'right', textColor: WARNING_ORANGE },
+        5: { cellWidth: 22, halign: 'right', fontStyle: 'bold', textColor: PRIMARY_PURPLE },
+        6: { cellWidth: 20, halign: 'right', textColor: SUCCESS_GREEN },
+        7: { cellWidth: 20, halign: 'right', textColor: DANGER_RED },
+        8: { cellWidth: 18, halign: 'center', fontSize: 7 }
       },
-      didParseCell: (data) => {
-        // Make the total row bold
-        if (data.row.index === tableData.length - 1) {
-          data.cell.styles.fontStyle = 'bold';
-          data.cell.styles.fillColor = [240, 240, 240];
+      alternateRowStyles: {
+        fillColor: [252, 252, 254]
+      },
+      didDrawCell: (data) => {
+        // Style status cells
+        if (data.column.index === 8 && data.section === 'body') {
+          const status = data.cell.text[0]?.toLowerCase();
+          if (status) {
+            const cellX = data.cell.x + 2;
+            const cellY = data.cell.y + 2;
+            const cellW = data.cell.width - 4;
+            const cellH = data.cell.height - 4;
+
+            // Status badge background
+            if (status === 'paid') {
+              doc.setFillColor(212, 237, 218);
+              doc.setTextColor(21, 87, 36);
+            } else if (status === 'pending') {
+              doc.setFillColor(255, 243, 205);
+              doc.setTextColor(133, 100, 4);
+            } else if (status === 'partial') {
+              doc.setFillColor(209, 236, 241);
+              doc.setTextColor(12, 84, 96);
+            } else if (status === 'overdue') {
+              doc.setFillColor(248, 215, 218);
+              doc.setTextColor(114, 28, 36);
+            }
+
+            doc.roundedRect(cellX, cellY, cellW, cellH, 2, 2, 'F');
+
+            // Redraw text on top
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.text(
+              data.cell.text[0].toUpperCase(),
+              data.cell.x + data.cell.width / 2,
+              data.cell.y + data.cell.height / 2 + 1,
+              { align: 'center', baseline: 'middle' }
+            );
+          }
         }
-      }
+      },
+      margin: { left: 14, right: 14 }
     });
 
-    // Save the PDF
-    doc.save(`Due_Report_${this.selectedDue}_${new Date().toISOString().split('T')[0]}.pdf`);
+    // ============ PROFESSIONAL FOOTER ============
+    const footerY = pageHeight - 20;
+
+    // Separator line
+    doc.setDrawColor(...PRIMARY_PURPLE);
+    doc.setLineWidth(0.5);
+    doc.line(14, footerY - 3, pageWidth - 14, footerY - 3);
+
+    // Background
+    doc.setFillColor(...LIGHT_GRAY);
+    doc.rect(0, footerY - 1, pageWidth, 21, 'F');
+
+    // Organization name
+    doc.setTextColor(...DARK_TEXT);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('FUND IT', pageWidth / 2, footerY + 4, { align: 'center' });
+
+    // Contact info
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 128, 150);
+    doc.text('Email: ramsatt@gmail.com  |  Phone: +91-8973576694', pageWidth / 2, footerY + 10, { align: 'center' });
+
+    // Disclaimer
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.text('This is a computer-generated report. No signature is required.', pageWidth / 2, footerY + 15, { align: 'center' });
+
+    // Save the PDF with modern filename
+    const timestamp = new Date().toISOString().split('T')[0];
+    doc.save(`DueReport_Due${this.selectedDue}_${timestamp}.pdf`);
   }
 }
