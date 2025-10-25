@@ -481,11 +481,11 @@ export class AccountDetailsComponent implements OnInit {
   }
 
   getTotalFundAmount(): number {
-    return this.accounts.reduce((sum, account) => sum + account.fund_amount, 0);
+    return this.filteredAccounts.reduce((sum, account) => sum + account.fund_amount, 0);
   }
 
   getTotalLoanAmount(): number {
-    return this.accounts.reduce((sum, account) => sum + account.loan_amount, 0);
+    return this.filteredAccounts.reduce((sum, account) => sum + account.loan_amount, 0);
   }
 
   getTotalAccounts(): number {
@@ -906,8 +906,8 @@ export class AccountDetailsComponent implements OnInit {
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
 
-    // WhatsApp Web API URL
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+    // Use api.whatsapp.com which works on both mobile and desktop
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
 
     // Show confirmation dialog
     const result = await Swal.fire({
@@ -920,7 +920,7 @@ export class AccountDetailsComponent implements OnInit {
           <p><strong>Total Loan:</strong> ₹${this.getTotalLoanAmount().toLocaleString('en-IN')}</p>
           <br>
           <p style="font-size: 13px; color: #666;">
-            <i class="fa fa-info-circle"></i> This will open WhatsApp Web with a pre-filled message.
+            <i class="fa fa-info-circle"></i> This will open WhatsApp with a pre-filled message.
             You can review and edit before sending.
           </p>
         </div>
@@ -934,7 +934,7 @@ export class AccountDetailsComponent implements OnInit {
     });
 
     if (result.isConfirmed) {
-      // Open WhatsApp in new window
+      // Open WhatsApp - will open app on mobile, web on desktop
       window.open(whatsappUrl, '_blank');
 
       await Swal.fire({
@@ -1001,7 +1001,7 @@ export class AccountDetailsComponent implements OnInit {
     const message = this.generatePaymentReminderMessage(payment, account);
 
     // Format mobile number for WhatsApp (remove leading 0 if present, add 91 country code)
-    let mobileNumber = account.mobile.trim();
+    let mobileNumber = account.mobile;
     if (mobileNumber.startsWith('0')) {
       mobileNumber = mobileNumber.substring(1);
     }
@@ -1010,8 +1010,8 @@ export class AccountDetailsComponent implements OnInit {
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
 
-    // WhatsApp Web API URL
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+    // Use api.whatsapp.com which works on both mobile and desktop
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
 
     // Show confirmation dialog
     const result = await Swal.fire({
@@ -1039,7 +1039,7 @@ export class AccountDetailsComponent implements OnInit {
     });
 
     if (result.isConfirmed) {
-      // Open WhatsApp in new window
+      // Open WhatsApp - will open app on mobile, web on desktop
       window.open(whatsappUrl, '_blank');
 
       await Swal.fire({
@@ -1105,23 +1105,7 @@ export class AccountDetailsComponent implements OnInit {
       return;
     }
 
-    // Generate receipt message
-    const message = this.generatePaymentReceiptMessage(payment, account);
-
-    // Format mobile number for WhatsApp (remove leading 0 if present, add 91 country code)
-    let mobileNumber = account.mobile.trim();
-    if (mobileNumber.startsWith('0')) {
-      mobileNumber = mobileNumber.substring(1);
-    }
-    const whatsappNumber = `91${mobileNumber}`;
-
-    // Encode message for URL
-    const encodedMessage = encodeURIComponent(message);
-
-    // WhatsApp Web API URL
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
-
-    // Show confirmation dialog
+    // Show initial confirmation with PDF generation option
     const result = await Swal.fire({
       title: 'Send Payment Receipt',
       html: `
@@ -1133,31 +1117,102 @@ export class AccountDetailsComponent implements OnInit {
           <p><strong>Amount Paid:</strong> ₹${payment.paid_amount.toLocaleString('en-IN')}</p>
           <p><strong>Payment Status:</strong> ${payment.payment_status.toUpperCase()}</p>
           <br>
-          <p style="font-size: 13px; color: #666;">
-            <i class="fa fa-info-circle"></i> This will open WhatsApp with the payment receipt details.
+          <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+            <i class="fa fa-info-circle"></i> Choose how to send the receipt:
           </p>
+          <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 12px;">
+            <p style="margin: 5px 0;"><strong>📱 Text Only:</strong> Send receipt details as text message</p>
+            <p style="margin: 5px 0;"><strong>📄 With PDF:</strong> Download PDF + Open WhatsApp (you can attach the PDF manually)</p>
+          </div>
         </div>
       `,
       icon: 'question',
       showCancelButton: true,
+      showDenyButton: true,
       confirmButtonColor: '#25D366',
+      denyButtonColor: '#0088cc',
       cancelButtonColor: '#718096',
-      confirmButtonText: '📱 Send Receipt',
+      confirmButtonText: '<i class="fas fa-comment"></i> Text Only',
+      denyButtonText: '<i class="fas fa-file-pdf"></i> With PDF',
       cancelButtonText: 'Cancel'
     });
 
-    if (result.isConfirmed) {
-      // Open WhatsApp in new window
-      window.open(whatsappUrl, '_blank');
+    if (result.isConfirmed || result.isDenied) {
+      // Generate receipt message
+      const message = this.generatePaymentReceiptMessage(payment, account);
 
-      await Swal.fire({
-        icon: 'success',
-        title: 'WhatsApp Opened!',
-        text: 'Please send the receipt from WhatsApp',
-        confirmButtonColor: '#25D366',
-        timer: 3000,
-        timerProgressBar: true
-      });
+      // Format mobile number for WhatsApp
+      let mobileNumber = account.mobile;
+      if (mobileNumber.startsWith('0')) {
+        mobileNumber = mobileNumber.substring(1);
+      }
+      const whatsappNumber = `91${mobileNumber}`;
+
+      // Encode message for URL
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+
+      // If user chose PDF option, generate and download PDF first
+      if (result.isDenied) {
+        try {
+          // Generate the PDF receipt
+          this.generatePaymentReceipt(payment, account);
+
+          // Wait a moment for download to start
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Show instructions
+          await Swal.fire({
+            icon: 'info',
+            title: 'PDF Downloaded!',
+            html: `
+              <div style="text-align: left; padding: 10px;">
+                <p style="margin-bottom: 15px;">✅ PDF receipt has been downloaded to your device.</p>
+                <p style="margin-bottom: 10px;"><strong>Next Steps:</strong></p>
+                <ol style="text-align: left; padding-left: 20px; line-height: 1.8;">
+                  <li>Click 'Open WhatsApp' below</li>
+                  <li>In WhatsApp, click the <strong>📎 attachment icon</strong></li>
+                  <li>Select <strong>Document</strong></li>
+                  <li>Choose the downloaded PDF receipt</li>
+                  <li>Add the pre-filled message and send</li>
+                </ol>
+                <p style="margin-top: 15px; font-size: 12px; color: #666;">
+                  <i class="fa fa-info-circle"></i> The PDF is saved in your Downloads folder
+                </p>
+              </div>
+            `,
+            confirmButtonColor: '#25D366',
+            confirmButtonText: '<i class="fab fa-whatsapp"></i> Open WhatsApp',
+            showCancelButton: true,
+            cancelButtonText: 'Close'
+          }).then((instructionResult) => {
+            if (instructionResult.isConfirmed) {
+              window.open(whatsappUrl, '_blank');
+            }
+          });
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+          await Swal.fire({
+            icon: 'error',
+            title: 'PDF Generation Failed',
+            text: 'Could not generate PDF. Opening WhatsApp with text message only.',
+            confirmButtonColor: '#25D366'
+          });
+          window.open(whatsappUrl, '_blank');
+        }
+      } else {
+        // Text only - just open WhatsApp
+        window.open(whatsappUrl, '_blank');
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'WhatsApp Opened!',
+          text: 'Please review and send the receipt message',
+          confirmButtonColor: '#25D366',
+          timer: 3000,
+          timerProgressBar: true
+        });
+      }
     }
   }
 

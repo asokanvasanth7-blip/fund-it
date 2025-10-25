@@ -129,7 +129,16 @@
               </div>
             </td>
           </tr>
+
         </tbody>
+        <tfoot>
+          <tr class="totals-row">
+            <td colspan="3" class="totals-label"><strong>TOTAL</strong></td>
+            <td class="amount-column"><strong>₹{{ getTotalFundAmount() | number:'1.2-2' }}</strong></td>
+            <td class="amount-column"><strong>₹{{ getTotalLoanAmount() | number:'1.2-2' }}</strong></td>
+            <td colspan="3"></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
 
