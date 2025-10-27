@@ -40,7 +40,7 @@ export class DashboardComponent implements OnInit {
   async ngOnInit() {
     this.user$.subscribe((user: any) => {
       if (user) {
-        this.userName = user.email?.split('@')[0] || 'User';
+        this.userName = this.authService.getUserDisplayName();
       }
     });
 

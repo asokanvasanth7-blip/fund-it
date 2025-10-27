@@ -15,6 +15,7 @@ export class App {
   user$;
   sidebarCollapsed = false;
   isMobile = false;
+  profileDropdownOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -61,8 +62,37 @@ export class App {
     this.router.navigate(['/login']);
   }
 
+  getUserDisplayName(): string {
+    return this.authService.getUserDisplayName();
+  }
+  getUserEmail(): string | null {
+    return this.authService.getUserEmail();
+  }
+
+  getUserPhotoURL(): string | null {
+    return this.authService.getUserPhotoURL();
+  }
+
+  toggleProfileDropdown(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.profileDropdownOpen = !this.profileDropdownOpen;
+  }
+
+  closeProfileDropdown() {
+    this.profileDropdownOpen = false;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.closeProfileDropdown();
+  }
+
+
   async logout() {
     try {
+      this.closeProfileDropdown();
       await this.authService.logout();
     } catch (error) {
       console.error('Logout error:', error);

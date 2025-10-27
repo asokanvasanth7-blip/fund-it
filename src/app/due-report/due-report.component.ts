@@ -194,7 +194,7 @@ export class DueReportComponent implements OnInit {
     // Organization Name
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('AZHISUKKUDI AMAVAASAI FUND', pageWidth / 2, 26, { align: 'center' });
+    doc.text('AZHISUKKUDI Amavasai FUND', pageWidth / 2, 26, { align: 'center' });
 
     doc.setFontSize(9);
     doc.text('2025 - 2027', pageWidth / 2, 32, { align: 'center' });

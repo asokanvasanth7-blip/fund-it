@@ -1060,7 +1060,7 @@ export class AccountDetailsComponent implements OnInit {
       year: 'numeric'
     });
 
-    let message = `🔔 *AZHISUKKUDI AMAVAASAI FUND (2025 - 2027) - PAYMENT REMINDER*\n`;
+    let message = `🔔 *AZHISUKKUDI Amavasai FUND (2025 - 2027) - PAYMENT REMINDER*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
     message += `Dear *${account.name}*,\n\n`;
@@ -1226,7 +1226,7 @@ export class AccountDetailsComponent implements OnInit {
     const receiptNo = `RCP-${account.account}-${payment.due_no.toString().padStart(3, '0')}`;
 
     let message = `🧾 *PAYMENT RECEIPT*\n`;
-    message += `*AZHISUKKUDI AMAVAASAI FUND (2025 - 2027)*\n`;
+    message += `*AZHISUKKUDI Amavasai FUND (2025 - 2027)*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
     message += `Receipt No: *${receiptNo}*\n`;
@@ -1259,7 +1259,7 @@ export class AccountDetailsComponent implements OnInit {
     message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
     message += `Thank you for your payment!\n\n`;
 
-    message += `*AZHISUKKUDI AMAVAASAI FUND*\n`;
+    message += `*AZHISUKKUDI Amavasai FUND*\n`;
     message += `📧 ramsatt@gmail.com\n`;
     message += `📱 +91-8973576694\n\n`;
 

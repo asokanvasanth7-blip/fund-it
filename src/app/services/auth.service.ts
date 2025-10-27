@@ -76,6 +76,28 @@ export class AuthService {
     return this.auth.currentUser;
   }
 
+  // Get user display name
+  getUserDisplayName(): string {
+    const user = this.getCurrentUser();
+    if (!user) {
+      return 'Guest';
+    }
+    // Try displayName first (from Google Sign-In), then email, then 'User'
+    return user.displayName || user.email?.split('@')[0] || 'User';
+  }
+
+  // Get user email
+  getUserEmail(): string | null {
+    const user = this.getCurrentUser();
+    return user?.email || null;
+  }
+
+  // Get user photo URL
+  getUserPhotoURL(): string | null {
+    const user = this.getCurrentUser();
+    return user?.photoURL || null;
+  }
+
   // Check if current user has edit access
   hasEditAccess(): boolean {
     const user = this.getCurrentUser();

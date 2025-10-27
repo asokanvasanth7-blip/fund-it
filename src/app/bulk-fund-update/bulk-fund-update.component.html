@@ -1,0 +1,163 @@
+<div class="bulk-update-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Bulk Fund Amount Update</h1>
+        <p class="subtitle">Update fund amounts for multiple accounts simultaneously</p>
+      </div>
+      <button class="btn btn-secondary" (click)="resetSelection()" [disabled]="processing">
+        <span class="icon">↻</span> Reset All
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading accounts...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading" class="content-wrapper">
+
+    <!-- Bulk Actions Panel -->
+    <div class="bulk-actions-panel">
+      <div class="panel-section">
+        <h3>Bulk Actions</h3>
+        <div class="bulk-controls">
+          <div class="form-group">
+            <label>Set Amount for Selected Accounts</label>
+            <div class="input-with-button">
+              <input
+                type="number"
+                [(ngModel)]="bulkFundAmount"
+                placeholder="Enter fund amount"
+                class="form-control"
+                min="0"
+                [disabled]="processing">
+              <button
+                class="btn btn-primary"
+                (click)="applyBulkAmount()"
+                [disabled]="processing || getSelectedCount() === 0">
+                Apply to {{ getSelectedCount() }} Selected
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="selection-summary">
+          <div class="summary-item">
+            <span class="label">Total Accounts:</span>
+            <span class="value">{{ accounts.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Selected:</span>
+            <span class="value highlight">{{ getSelectedCount() }}</span>
+          </div>
+        </div>
+        <button
+          class="btn btn-success btn-large"
+          (click)="processBulkUpdate()"
+          [disabled]="processing || getSelectedCount() === 0">
+          <span class="icon">✓</span> Update {{ getSelectedCount() }} Account(s)
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div *ngIf="processing" class="progress-container">
+      <div class="progress-header">
+        <h3>Processing Updates...</h3>
+        <span class="progress-text">{{ processedCount }} / {{ totalCount }}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progressPercentage">
+          <span class="progress-percentage">{{ progressPercentage }}%</span>
+        </div>
+      </div>
+      <div class="progress-stats">
+        <span class="stat success">✓ Success: {{ successCount }}</span>
+        <span class="stat error">✗ Failed: {{ errorCount }}</span>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-section">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="filterAccounts()"
+          placeholder="Search by account number or name..."
+          class="search-input"
+          [disabled]="processing">
+      </div>
+    </div>
+
+    <!-- Accounts Table -->
+    <div class="table-container">
+      <table class="accounts-table">
+        <thead>
+          <tr>
+            <th class="checkbox-col">
+              <input
+                type="checkbox"
+                [checked]="selectAll"
+                (change)="toggleSelectAll()"
+                [disabled]="processing">
+            </th>
+            <th>Account</th>
+            <th>Name</th>
+            <th>Current Fund Amount</th>
+            <th>New Fund Amount</th>
+            <th class="status-col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let account of filteredAccounts"
+              [class.selected]="account.selected"
+              [class]="getStatusClass(account.status)">
+            <td class="checkbox-col">
+              <input
+                type="checkbox"
+                [checked]="account.selected"
+                (change)="toggleAccountSelection(account)"
+                [disabled]="processing">
+            </td>
+            <td class="account-col">{{ account.account }}</td>
+            <td class="name-col">{{ account.name }}</td>
+            <td class="amount-col">
+              ₹{{ (account.fund_amount || 0).toLocaleString('en-IN') }}
+            </td>
+            <td class="new-amount-col">
+              <input
+                type="number"
+                [(ngModel)]="account.newFundAmount"
+                class="amount-input"
+                min="0"
+                [disabled]="processing || !account.selected"
+                [class.disabled]="!account.selected">
+            </td>
+            <td class="status-col">
+              <span class="status-badge" [class]="getStatusClass(account.status)">
+                <span class="status-icon">{{ getStatusIcon(account.status) }}</span>
+                <span *ngIf="account.status === 'processing'">Processing</span>
+                <span *ngIf="account.status === 'success'">Updated</span>
+                <span *ngIf="account.status === 'error'">Failed</span>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="filteredAccounts.length === 0" class="no-results">
+        <p>No accounts found matching your search.</p>
+      </div>
+    </div>
+  </div>
+</div>
+

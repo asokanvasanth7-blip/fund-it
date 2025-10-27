@@ -50,6 +50,18 @@
           </a>
         </li>
         <li class="nav-item">
+          <a routerLink="/due-report" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Due Report</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/bulk-fund-update" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">📦</span>
+            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Bulk Fund Update</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a routerLink="/upload" routerLinkActive="active" class="nav-link">
             <span class="nav-icon">📤</span>
             <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Upload Data</span>
@@ -64,9 +76,12 @@
         <div class="user-section">
           <div class="user-info" [hidden]="sidebarCollapsed && !isMobile">
             <span class="user-icon">👤</span>
-            <span class="user-email">{{ user.email }}</span>
+            <div class="user-details">
+              <span class="user-name">{{ getUserDisplayName() }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
           </div>
-          <button class="btn-logout" (click)="logout()" [title]="sidebarCollapsed ? user.email : ''">
+          <button class="btn-logout" (click)="logout()" [title]="sidebarCollapsed ? getUserDisplayName() : ''">
             <span [hidden]="sidebarCollapsed && !isMobile">Logout</span>
             <span [hidden]="!sidebarCollapsed || isMobile">🚪</span>
           </button>
@@ -89,6 +104,33 @@
 
   <!-- Main Content Area -->
   <main class="main-content" [class.main-content-expanded]="sidebarCollapsed">
+    <!-- App Header (Desktop) -->
+    <header class="app-header" *ngIf="user$ | async as user">
+      <div class="header-content">
+        <div class="header-left">
+          <h2 class="header-title">Azhisukudi Amavasai Fund</h2>
+        </div>
+        <div class="header-right">
+          <!-- Profile Dropdown -->
+          <div class="profile-container">
+            <button class="profile-trigger" (click)="toggleProfileDropdown($event)">
+              <img
+                *ngIf="user.photoURL"
+                [src]="user.photoURL"
+                alt="Profile"
+                class="profile-image"
+                referrerpolicy="no-referrer">
+              <div *ngIf="!user.photoURL" class="profile-avatar">
+                {{ (user.displayName || user.email || 'U').charAt(0).toUpperCase() }}
+              </div>
+              <span class="profile-name">{{ user.displayName || (user.email ? user.email.split('@')[0] : 'User') }}</span>
+              <span class="dropdown-arrow" [class.open]="profileDropdownOpen">▼</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
     <!-- Top Bar for Mobile -->
     <div class="mobile-topbar">
       <button class="mobile-menu-btn" (click)="toggleSidebar()">
@@ -98,11 +140,28 @@
         <span>💰</span>
         <span class="ms-2">Fund<span style="color: #90EE90;">It</span></span>
       </div>
+      <!-- Mobile Profile -->
+      <div class="mobile-profile" *ngIf="user$ | async as user">
+        <button class="mobile-profile-btn" (click)="toggleProfileDropdown($event)">
+          <img
+            *ngIf="user.photoURL"
+            [src]="user.photoURL"
+            alt="Profile"
+            class="mobile-profile-image"
+            referrerpolicy="no-referrer">
+          <div *ngIf="!user.photoURL" class="mobile-profile-avatar">
+            {{ (user.displayName || user.email || 'U').charAt(0).toUpperCase() }}
+          </div>
+        </button>
+      </div>
     </div>
 
     <router-outlet />
   </main>
 </div>
+
+<!-- Profile Dropdown Overlay -->
+<div class="profile-overlay" [class.active]="profileDropdownOpen" (click)="closeProfileDropdown()"></div>
 
 <!-- Mobile Overlay -->
 <div class="sidebar-overlay" [class.active]="!sidebarCollapsed" (click)="toggleSidebar()"></div>
