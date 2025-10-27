@@ -164,7 +164,8 @@ export class UpdateLoanDetailsComponent implements OnInit {
       );
 
       if (!firestoreAccount) {
-        throw new Error('Account not found in database');
+        this.error = 'Account not found in database';
+        return;
       }
 
       // Update in Firestore
@@ -210,13 +211,6 @@ export class UpdateLoanDetailsComponent implements OnInit {
       });
     } finally {
       this.isUpdating = false;
-    }
-  }
-
-  resetForm() {
-    if (this.selectedAccount) {
-      this.newLoanAmount = this.selectedAccount.loan_amount;
-      this.updateReason = '';
     }
   }
 

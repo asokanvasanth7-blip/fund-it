@@ -1112,11 +1112,6 @@ export class AccountDetailsComponent implements OnInit {
   }
 
   generatePaymentReminderMessage(payment: PaymentEntry, account: AccountDetails): string {
-    const today = new Date().toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
 
     let message = `🔔 *AZHISUKKUDI Amavasai FUND (2025 - 2027) - PAYMENT REMINDER*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;

@@ -234,7 +234,10 @@ export class BulkFundUpdateComponent implements OnInit {
           account.fund_amount = account.newFundAmount;
           this.successCount++;
         } else {
-          throw new Error('Account document not found');
+          console.error('Account document not found');
+          account.status = 'error';
+          account.errorMessage = 'Account document not found';
+          this.errorCount++;
         }
       } catch (error) {
         console.error(`Error updating account ${account.account}:`, error);

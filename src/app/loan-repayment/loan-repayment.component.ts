@@ -247,7 +247,13 @@ export class LoanRepaymentComponent implements OnInit {
         // Clear selection and form
         this.clearSelection();
       } else {
-        throw new Error('Account document not found');
+        console.error('Account document not found');
+        Swal.fire({
+          icon: 'error',
+          title: 'Repayment Failed',
+          text: 'Account document not found'
+        });
+        return;
       }
     } catch (error) {
       console.error('Error processing repayment:', error);

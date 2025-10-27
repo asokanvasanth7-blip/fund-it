@@ -157,17 +157,19 @@ export class PaymentCollectionComponent implements OnInit {
       return;
     }
 
-    try {
-      this.processing = true;
-      this.paymentError = null;
+    this.processing = true;
+    this.paymentError = null;
 
+    try {
       // Find the payment index
       const paymentIndex = this.selectedAccount.due_payments.findIndex(
         p => p.due_no === this.selectedPayment!.due_no
       );
 
       if (paymentIndex === -1) {
-        throw new Error('Payment not found');
+        this.paymentError = 'Payment not found';
+        this.processing = false;
+        return;
       }
 
       // Update payment details

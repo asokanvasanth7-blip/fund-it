@@ -60,7 +60,6 @@ export class DueReportComponent implements OnInit {
       // Fetch all account details
       const accounts = await this.firestoreService.getAllDocuments('accountDetails');
 
-      let serialNo = 1;
       this.totalDueAmount = 0;
       this.totalLoanInterest = 0;
       this.totalPayableAmount = 0;

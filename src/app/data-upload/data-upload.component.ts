@@ -81,41 +81,6 @@ export class DataUploadComponent implements OnInit {
     }
   }
 
-  async uploadAccountDetails() {
-    if (!this.hasEditAccess) {
-      this.accountUploadError = 'You do not have permission to upload data';
-      alert('Access Denied: You do not have permission to upload data');
-      return;
-    }
-
-    this.accountUploading = true;
-    this.accountUploadComplete = false;
-    this.accountUploadError = null;
-    this.accountUploadedCount = 0;
-
-    try {
-      const accountData = accountDetailsData as AccountDetailsList;
-
-      console.log('Starting upload of', accountData.length, 'account records...');
-
-      const results = await this.firestoreService.addMultipleDocuments(
-        'accountDetails',
-        accountData
-      );
-
-      this.accountUploadedCount = results.length;
-      this.accountUploadComplete = true;
-      console.log('Upload complete! Uploaded', results.length, 'account records.');
-      console.log('Document IDs:', results);
-
-    } catch (error: any) {
-      this.accountUploadError = error.message || 'An error occurred during account upload';
-      console.error('Account upload failed:', error);
-    } finally {
-      this.accountUploading = false;
-    }
-  }
-
   async viewAccountData() {
     try {
       const data = await this.firestoreService.getAllDocuments('accountDetails');
