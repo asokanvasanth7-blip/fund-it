@@ -160,6 +160,46 @@
   </main>
 </div>
 
+<!-- Shared Profile Dropdown Menu (for both Desktop and Mobile) -->
+<div class="profile-dropdown-wrapper" *ngIf="user$ | async as user">
+  <div class="profile-dropdown" [class.show]="profileDropdownOpen" (click)="$event.stopPropagation()">
+    <div class="dropdown-header">
+      <div class="dropdown-profile-image">
+        <img
+          *ngIf="user.photoURL"
+          [src]="user.photoURL"
+          alt="Profile"
+          referrerpolicy="no-referrer">
+        <div *ngIf="!user.photoURL" class="dropdown-avatar">
+          {{ (user.displayName || user.email || 'U').charAt(0).toUpperCase() }}
+        </div>
+      </div>
+      <div class="dropdown-user-info">
+        <h4>{{ user.displayName || (user.email ? user.email.split('@')[0] : 'User') }}</h4>
+        <p>{{ user.email }}</p>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-body">
+      <a routerLink="/dashboard" class="dropdown-item" (click)="closeProfileDropdown()">
+        <span class="item-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/account-details" class="dropdown-item" (click)="closeProfileDropdown()">
+        <span class="item-icon">👤</span>
+        <span>My Profile</span>
+      </a>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-footer">
+      <button class="dropdown-logout" (click)="logout()">
+        <span class="item-icon">🚪</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Profile Dropdown Overlay -->
 <div class="profile-overlay" [class.active]="profileDropdownOpen" (click)="closeProfileDropdown()"></div>
 
