@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">fund-it</string>
+    <string name="title_activity_main">fund-it</string>
+    <string name="package_name">com.fundit.app</string>
+    <string name="custom_url_scheme">com.fundit.app</string>
+</resources>
