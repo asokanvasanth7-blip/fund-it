@@ -1,18 +1,5 @@
 <div class="dashboard-container">
   <!-- Header -->
-  <header class="page-header">
-    <div class="header-content">
-      <div>
-        <h1>Dashboard</h1>
-        <p class="subtitle" *ngIf="user$ | async as user">Welcome back, {{ userName }}! 👋</p>
-      </div>
-      <div class="header-actions">
-        <button class="logout-button" (click)="logout()">
-          🚪 Logout
-        </button>
-      </div>
-    </div>
-  </header>
 
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
@@ -103,32 +90,40 @@
 
     <!-- Recent Information -->
     <div class="info-grid">
-      <!-- Recent Accounts -->
+      <!-- Recent Payments -->
       <div class="info-card">
         <div class="info-card-header">
-          <h3 class="info-card-title">👥 Recent Members</h3>
-          <a routerLink="/account-details" class="view-all-link">View All →</a>
+          <h3 class="info-card-title">💳 Recent Payments</h3>
+          <a routerLink="/payment-collection" class="view-all-link">View All →</a>
         </div>
 
-        <div *ngIf="recentAccounts.length === 0" class="empty-state">
+        <div *ngIf="recentPayments.length === 0" class="empty-state">
           <span class="empty-icon">📭</span>
-          <p>No member data available</p>
+          <p>No payment data available</p>
         </div>
 
-        <div class="data-table-container" *ngIf="recentAccounts.length > 0">
+        <div class="data-table-container" *ngIf="recentPayments.length > 0">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Member ID</th>
+                <th>Account</th>
                 <th>Name</th>
-                <th>Fund Amount</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let account of recentAccounts">
-                <td><strong>{{ account.member_id }}</strong></td>
-                <td>{{ account.member_name }}</td>
-                <td class="amount-cell">₹{{ account.fund_amount | number:'1.0-0' }}</td>
+              <tr *ngFor="let payment of recentPayments">
+                <td><strong>{{ payment.account_id }}</strong></td>
+                <td>{{ payment.account_name }}</td>
+                <td>{{ formatDate(payment.payment_date) }}</td>
+                <td class="amount-cell">₹{{ payment.paid_amount | number:'1.0-0' }}</td>
+                <td>
+                  <span class="payment-badge" [ngClass]="getPaymentStatusClass(payment.payment_status)">
+                    {{ payment.payment_status === 'paid' ? 'Paid' : 'Partial' }}
+                  </span>
+                </td>
               </tr>
             </tbody>
           </table>

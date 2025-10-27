@@ -15,11 +15,11 @@
         <button class="json-export-button" (click)="exportAllAccountsJSON()" *ngIf="filteredAccounts.length > 0">
           📥 Export JSON
         </button>
-        <button class="json-import-button" (click)="importFileInput.click()">
+        <button class="json-import-button" (click)="importFileInput.click()" *ngIf="hasEditAccess">
           📤 Import JSON
         </button>
         <input #importFileInput type="file" accept=".json" (change)="importAccountsJSON($event)" style="display: none;">
-        <button class="add-account-button" (click)="openAddAccountForm()">
+        <button class="add-account-button" (click)="openAddAccountForm()" *ngIf="hasEditAccess">
           <span class="button-icon">+</span> Add New Account
         </button>
       </div>
@@ -208,7 +208,7 @@
         <div>
           <div *ngIf="!isEditingName" class="account-name-section">
             <h2>{{ selectedAccount.name }}</h2>
-            <button class="edit-name-button" (click)="startEditName()" title="Edit account name">
+            <button class="edit-name-button" (click)="startEditName()" title="Edit account name" *ngIf="hasEditAccess">
               ✏️ Edit Name
             </button>
           </div>
@@ -244,7 +244,7 @@
             <div *ngIf="!isEditingMobile" class="mobile-display">
               <span class="mobile-icon">📱</span>
               <span class="mobile-text">{{ selectedAccount.mobile || 'No mobile number' }}</span>
-              <button class="edit-mobile-button" (click)="startEditMobile()" title="Edit mobile number">
+              <button class="edit-mobile-button" (click)="startEditMobile()" title="Edit mobile number" *ngIf="hasEditAccess">
                 ✏️ Edit Mobile
               </button>
             </div>

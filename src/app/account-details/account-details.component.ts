@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AccountDetails, AccountDetailsList, PaymentEntry } from '../models/account-details.model';
 import { FirestoreService } from '../services/firestore.service';
+import { AuthService } from '../services/auth.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Swal from 'sweetalert2';
@@ -32,8 +33,14 @@ export class AccountDetailsComponent implements OnInit {
   isEditingMobile: boolean = false;
   editedMobile: string = '';
   updatingMobile: boolean = false;
+  hasEditAccess: boolean = false;
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private firestoreService: FirestoreService,
+    private authService: AuthService
+  ) {
+    this.hasEditAccess = this.authService.hasEditAccess();
+  }
 
   async ngOnInit() {
     await this.loadAccounts();
@@ -137,6 +144,17 @@ export class AccountDetailsComponent implements OnInit {
 
   // Import accounts from JSON file
   async importAccountsJSON(event: any) {
+    if (!this.hasEditAccess) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to import accounts',
+        confirmButtonColor: '#dc3545'
+      });
+      event.target.value = '';
+      return;
+    }
+
     const file: File = event.target.files[0];
     if (!file) {
       return;
@@ -301,6 +319,16 @@ export class AccountDetailsComponent implements OnInit {
   }
 
   startEditName() {
+    if (!this.hasEditAccess) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to edit account details',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
     if (this.selectedAccount) {
       this.isEditingName = true;
       this.editedName = this.selectedAccount.name;
@@ -313,6 +341,16 @@ export class AccountDetailsComponent implements OnInit {
   }
 
   startEditMobile() {
+    if (!this.hasEditAccess) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to edit account details',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
     if (this.selectedAccount) {
       this.isEditingMobile = true;
       this.editedMobile = this.selectedAccount.mobile || '';
@@ -331,6 +369,16 @@ export class AccountDetailsComponent implements OnInit {
         title: 'No Account Selected',
         text: 'Please select an account first',
         confirmButtonColor: '#ffc107'
+      });
+      return;
+    }
+
+    if (!this.hasEditAccess) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to edit account details',
+        confirmButtonColor: '#dc3545'
       });
       return;
     }
@@ -409,6 +457,16 @@ export class AccountDetailsComponent implements OnInit {
   }
 
   async saveAccountName() {
+    if (!this.hasEditAccess) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to edit account details',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
     if (!this.selectedAccount || !this.editedName.trim()) {
       await Swal.fire({
         icon: 'warning',

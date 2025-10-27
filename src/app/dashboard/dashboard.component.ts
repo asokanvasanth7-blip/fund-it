@@ -24,7 +24,7 @@ export class DashboardComponent implements OnInit {
   totalPendingDues: number = 0;
 
   // Recent activities
-  recentAccounts: any[] = [];
+  recentPayments: any[] = [];
   upcomingDues: any[] = [];
 
   loading: boolean = true;
@@ -59,8 +59,8 @@ export class DashboardComponent implements OnInit {
       this.totalLoanAmount = accountsData.reduce((sum: number, acc: any) => sum + (acc.loan_amount || 0), 0);
       this.availableFunds = this.totalFundAmount - this.totalLoanAmount;
 
-      // Get recent 5 accounts
-      this.recentAccounts = accountsData.slice(0, 5);
+      // Load recent payments from payment history
+      await this.loadRecentPayments(accountsData);
 
       // Load due schedule
       try {
@@ -90,6 +90,46 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  async loadRecentPayments(accountsData: any[]) {
+    try {
+      // Collect all payments from all accounts
+      const allPayments: any[] = [];
+
+      accountsData.forEach((account: any) => {
+        if (account.due_payments && Array.isArray(account.due_payments)) {
+          account.due_payments.forEach((payment: any) => {
+            // Only include paid or partial payments
+            if (payment.payment_status === 'paid' || payment.payment_status === 'partial') {
+              allPayments.push({
+                account_id: account.account,
+                account_name: account.name,
+                due_no: payment.due_no,
+                payment_date: payment.payment_date || payment.due_date,
+                paid_amount: payment.paid_amount,
+                payment_status: payment.payment_status,
+                due_amount: payment.due_amount
+              });
+            }
+          });
+        }
+      });
+
+      // Sort by payment date (most recent first) and get last 5
+      this.recentPayments = allPayments
+        .filter(p => p.payment_date)
+        .sort((a, b) => {
+          const dateA = new Date(a.payment_date).getTime();
+          const dateB = new Date(b.payment_date).getTime();
+          return dateB - dateA; // Descending order
+        })
+        .slice(0, 5);
+
+    } catch (error) {
+      console.error('Error loading recent payments:', error);
+      this.recentPayments = [];
+    }
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
@@ -99,6 +139,14 @@ export class DashboardComponent implements OnInit {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-IN');
+  }
+
+  getPaymentStatusClass(status: string): string {
+    switch (status) {
+      case 'paid': return 'status-paid';
+      case 'partial': return 'status-partial';
+      default: return '';
+    }
   }
 }
 
