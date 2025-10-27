@@ -10,13 +10,15 @@
 
 .page-header h1 {
   font-size: 2rem;
-  color: #333;
+  color: #1a202c;
   margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
 .subtitle {
-  color: #666;
+  color: #64748b;
   font-size: 1rem;
+  font-weight: 500;
 }
 
 /* Loading & Error States */
@@ -295,14 +297,26 @@
 }
 
 .account-id {
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 0.95rem;
   margin-bottom: 0.25rem;
+  color: #1a202c;
+}
+
+.account-card.selected .account-id {
+  color: white;
 }
 
 .account-name {
   font-size: 0.85rem;
-  opacity: 0.9;
+  opacity: 1;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.account-card.selected .account-name {
+  color: white;
+  opacity: 0.95;
 }
 
 /* Payments Section */
@@ -328,13 +342,16 @@
 
 .account-info h2 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #1a202c;
+  font-weight: 700;
+  font-size: 1.75rem;
 }
 
 .account-subtitle {
   margin: 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 /* JSON Actions */
@@ -419,6 +436,8 @@
 .due-table td {
   padding: 0.875rem 1rem;
   border-bottom: 1px solid #e9ecef;
+  color: #1a202c;
+  font-weight: 500;
 }
 
 .due-table tbody tr:hover {
@@ -432,11 +451,14 @@
 .amount {
   text-align: right;
   font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #2d3748;
 }
 
 .total {
-  font-weight: 600;
-  color: #28a745;
+  font-weight: 700;
+  color: #16a34a;
+  font-size: 1.05rem;
 }
 
 /* Status Badge */
@@ -477,11 +499,13 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.875rem;
+  font-weight: 600;
   transition: transform 0.2s;
 }
 
 .edit-btn:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* Modal */

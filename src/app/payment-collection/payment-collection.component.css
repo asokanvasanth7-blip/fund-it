@@ -10,12 +10,13 @@
 
 .page-header h1 {
   font-size: 2rem;
-  color: #333;
+  color: #1a202c;
   margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
 .subtitle {
-  color: #666;
+  color: #64748b;
   font-size: 1rem;
 }
 
@@ -384,13 +385,16 @@
 
 .account-info h2 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #1a202c;
+  font-weight: 700;
+  font-size: 1.75rem;
 }
 
 .account-subtitle {
   margin: 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .account-stats {
@@ -406,17 +410,19 @@
 
 .stat-label {
   font-size: 0.85rem;
-  color: #666;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .stat-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #333;
+  color: #1a202c;
 }
 
 .stat-value.amount {
-  color: #28a745;
+  color: #16a34a;
+  font-size: 1.4rem;
 }
 
 .no-pending {
@@ -457,6 +463,8 @@
 .payments-table td {
   padding: 0.875rem 1rem;
   border-bottom: 1px solid #e9ecef;
+  color: #1a202c;
+  font-weight: 500;
 }
 
 .payments-table tbody tr:hover {
@@ -470,11 +478,14 @@
 .amount {
   text-align: right;
   font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #2d3748;
 }
 
 .balance {
-  font-weight: 600;
-  color: #ffc107;
+  font-weight: 700;
+  color: #d97706;
+  font-size: 1.05rem;
 }
 
 /* Status Badge */
@@ -515,7 +526,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: transform 0.2s;
 }
 
@@ -525,11 +536,12 @@
 }
 
 .collect-btn:disabled {
-  background: #e9ecef;
-  color: #6c757d;
+  background: #cbd5e0;
+  color: #718096;
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 1;
   transform: none;
+  font-weight: 600;
 }
 
 /* Modal */

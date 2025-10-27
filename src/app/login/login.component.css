@@ -3,14 +3,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   padding: 20px;
 }
 
 .login-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   width: 100%;
   max-width: 440px;
   overflow: hidden;
@@ -23,12 +25,12 @@
 
 .login-header h2 {
   margin-bottom: 8px;
-  color: #1a1a1a;
+  color: #f1f5f9;
   font-weight: 600;
 }
 
 .login-header .text-muted {
-  color: #6c757d;
+  color: #94a3b8;
   margin-bottom: 0;
 }
 
@@ -38,35 +40,39 @@
 
 .form-label {
   font-weight: 500;
-  color: #333;
+  color: #f1f5f9;
   margin-bottom: 8px;
 }
 
 .form-control {
   padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.4);
+  color: #f1f5f9;
   font-size: 14px;
 }
 
 .form-control:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .btn-primary {
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 500;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   border: none;
   transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6);
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
 }
 
 .btn-primary:disabled {
@@ -85,19 +91,19 @@
 .divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .divider span {
   padding: 0 12px;
-  color: #6c757d;
+  color: #94a3b8;
   font-size: 14px;
   font-weight: 500;
 }
 
 .google-btn {
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 500;
   display: flex;
   align-items: center;

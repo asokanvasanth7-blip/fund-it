@@ -1,8 +1,19 @@
+/* Component-level CSS Variables */
+:host {
+  --primary-green: #2d5016;
+  --primary-green-light: #3d6b1f;
+  --text-dark: #1a202c;
+  --text-muted: #6b7280;
+  --success-green: #10b981;
+}
+
 /* Account Details Container */
 .account-details-container {
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
+  background: #f8fafc;
+  min-height: 100vh;
 }
 
 /* Page Header */
@@ -24,21 +35,23 @@
 
 .page-header h1 {
   margin: 0 0 8px 0;
-  font-size: 28px;
-  color: var(--text-dark);
+  font-size: 32px;
+  color: #1a202c;
   font-weight: 700;
 }
 
 .subtitle {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 14px;
+  color: #64748b;
+  font-size: 15px;
 }
 
 .header-actions {
   display: flex;
   gap: 12px;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .add-account-button,
@@ -46,17 +59,18 @@
 .whatsapp-button,
 .json-export-button,
 .json-import-button {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
-  display: flex;
+  font-size: 13px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
+  min-width: fit-content;
 }
 
 .add-account-button {
@@ -269,19 +283,22 @@
 
 .card-content h3 {
   margin: 0 0 8px 0;
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.8;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 1;
+  color: #64748b;
 }
 
 .summary-card.highlight .card-content h3 {
   color: white;
+  opacity: 0.95;
 }
 
 .card-content .amount {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
+  color: #1a202c;
 }
 
 /* Accounts Table */
@@ -467,22 +484,25 @@
 }
 
 .accounts-table thead {
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .accounts-table th {
   padding: 16px 12px;
   text-align: left;
-  font-weight: 600;
-  color: var(--text-dark);
+  font-weight: 700;
+  color: #1e293b;
   font-size: 14px;
-  border-bottom: 2px solid #dee2e6;
+  border-bottom: 2px solid #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .accounts-table td {
   padding: 16px 12px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #e2e8f0;
   font-size: 14px;
+  color: #334155;
 }
 
 .account-row {
@@ -515,12 +535,14 @@
 }
 
 .account-id {
-  font-weight: 600;
-  color: var(--primary-green);
+  font-weight: 700;
+  color: #2d5016;
+  font-size: 15px;
 }
 
 .account-name {
-  font-weight: 500;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .mobile-number {
@@ -568,18 +590,22 @@
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .view-button,
 .export-button {
-  padding: 8px 16px;
+  padding: 8px 12px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   transition: all 0.3s ease;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .view-button {
@@ -672,14 +698,16 @@
 
 .modal-header h2 {
   margin: 0 0 8px 0;
-  font-size: 24px;
-  color: var(--text-dark);
+  font-size: 28px;
+  color: #1a202c;
+  font-weight: 700;
 }
 
 .modal-subtitle {
   margin: 0;
   font-size: 14px;
-  color: var(--text-muted);
+  color: #64748b;
+  font-weight: 500;
 }
 
 .close-button {
@@ -908,14 +936,14 @@
 
 .summary-item .label {
   font-size: 13px;
-  color: var(--text-muted);
-  font-weight: 500;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .summary-item .value {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #1a202c;
 }
 
 .summary-item .value.success {
@@ -929,9 +957,9 @@
 /* Section Title */
 .section-title {
   margin: 0 0 16px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-dark);
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a202c;
 }
 
 /* Payments Table */
@@ -949,23 +977,24 @@
 }
 
 .payments-table thead {
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .payments-table th {
   padding: 12px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
-  color: var(--text-dark);
-  border-bottom: 2px solid #dee2e6;
+  color: #1e293b;
+  border-bottom: 2px solid #cbd5e1;
   white-space: nowrap;
 }
 
 .payments-table td {
   padding: 12px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #e2e8f0;
   font-size: 13px;
+  color: #334155;
 }
 
 .payments-table tbody tr:hover {
@@ -1383,6 +1412,22 @@
   }
 }
 
+/* Medium screens - handle button wrapping */
+@media (max-width: 1200px) {
+  .header-actions {
+    justify-content: flex-start;
+  }
+
+  .add-account-button,
+  .export-all-button,
+  .whatsapp-button,
+  .json-export-button,
+  .json-import-button {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+}
+
 /* Tablet Responsive */
 @media (min-width: 769px) and (max-width: 1024px) {
   .account-details-container {
@@ -1393,8 +1438,24 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .header-actions {
     flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .add-account-button,
+  .export-all-button,
+  .whatsapp-button,
+  .json-export-button,
+  .json-import-button {
+    flex: 1 1 auto;
+    min-width: calc(50% - 6px);
   }
 
   .action-buttons {
