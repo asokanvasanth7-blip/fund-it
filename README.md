@@ -1,3 +1,46 @@
+# Or PowerShell Script
+.\build-android.ps1
+
+# Or NPM Script
+npm run run:android
+```
+
+#### Option 2: Manual Commands
+```bash
+# Build Angular app
+ng build --configuration production
+
+# Sync with Android
+npx cap sync android
+
+# Open in Android Studio
+npx cap open android
+```
+
+### Prerequisites for Android Build
+- **Android Studio**: Download from https://developer.android.com/studio
+- **Java Development Kit (JDK)**: JDK 17 recommended
+- **Android SDK**: Installed via Android Studio
+
+### Build APK in Android Studio
+1. Wait for Gradle sync to complete
+2. Click **Build** → **Build Bundle(s) / APK(s)** → **Build APK(s)**
+3. Find APK at: `android/app/build/outputs/apk/debug/app-debug.apk`
+
+### For Production Release
+1. Click **Build** → **Generate Signed Bundle / APK**
+2. Create/use keystore (SAVE IT SAFELY!)
+3. Find at: `android/app/build/outputs/apk/release/app-release.apk`
+
+### Documentation
+- **Quick Start**: See `ANDROID-QUICKSTART.md`
+- **Full Guide**: See `ANDROID-BUILD.md` for comprehensive documentation
+
+### Android App Configuration
+- **App ID**: com.fundit.app
+- **App Name**: Fund-It
+- **Installed Plugins**: Status Bar, Splash Screen
+
 # Fund IT - Ammuvadi Fund Management System
 
 A comprehensive web-based fund management system for managing member accounts, tracking fund collections, processing loan payments, and monitoring due schedules. Built with Angular 20.3.6 and Firebase.
@@ -496,6 +539,17 @@ The built files in `dist/fund-it/browser/` can be deployed to:
 - **GitHub Pages**
 - **AWS S3 + CloudFront**
 - Any static hosting service
+
+## 📱 Building for Android
+
+The Fund-IT app can be built as a native Android application using Capacitor.
+
+### Quick Start
+
+#### Option 1: Using Build Scripts (Easiest)
+```bash
+# Windows Batch Script
+build-android.bat
 
 ## 🐛 Troubleshooting
 

@@ -5,8 +5,12 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "watch": "ng build --watch --configuration production",
+    "test": "ng test",
+    "build:android": "ng build --configuration production && npx cap sync android",
+    "open:android": "npx cap open android",
+    "sync:android": "npx cap sync android",
+    "run:android": "ng build --configuration production && npx cap sync android && npx cap open android"
   },
   "prettier": {
     "printWidth": 100,
@@ -29,6 +33,11 @@
     "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/splash-screen": "^7.0.3",
+    "@capacitor/status-bar": "^7.0.3",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "firebase": "^11.10.0",
