@@ -17,6 +17,7 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   user$: Observable<User | null>;
+  private readonly EDIT_ACCESS_EMAILS = ['ramsatt@gmail.com', 'codingpullingo@gmail.com'];
 
   constructor(private auth: Auth) {
     this.user$ = new Observable((subscriber) => {
@@ -73,5 +74,22 @@ export class AuthService {
   // Get current user
   getCurrentUser(): User | null {
     return this.auth.currentUser;
+  }
+
+  // Check if current user has edit access
+  hasEditAccess(): boolean {
+    const user = this.getCurrentUser();
+    if (!user || !user.email) {
+      return false;
+    }
+    return this.EDIT_ACCESS_EMAILS.includes(user.email.toLowerCase());
+  }
+
+  // Check if a specific email has edit access
+  checkEditAccessForEmail(email: string | null | undefined): boolean {
+    if (!email) {
+      return false;
+    }
+    return this.EDIT_ACCESS_EMAILS.includes(email.toLowerCase());
   }
 }

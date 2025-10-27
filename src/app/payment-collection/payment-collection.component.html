@@ -148,8 +148,8 @@
                     <button
                       (click)="openPaymentModal(payment)"
                       class="collect-btn"
-                      [disabled]="!canCollectPayment(payment)"
-                      [title]="!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due'">
+                      [disabled]="!hasEditAccess || !canCollectPayment(payment)"
+                      [title]="!hasEditAccess ? 'You do not have permission to collect payments' : (!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due')">
                       💰 Collect Payment
                     </button>
                   </td>
@@ -194,8 +194,8 @@
                 <button
                   (click)="openPaymentModal(payment)"
                   class="collect-btn-mobile"
-                  [disabled]="!canCollectPayment(payment)"
-                  [title]="!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due'">
+                  [disabled]="!hasEditAccess || !canCollectPayment(payment)"
+                  [title]="!hasEditAccess ? 'You do not have permission to collect payments' : (!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due')">
                   💰 Collect Payment
                 </button>
               </div>
@@ -304,7 +304,7 @@
 
       <div class="modal-footer">
         <button type="button" (click)="closePaymentModal()" class="btn-cancel">Cancel</button>
-        <button type="button" (click)="collectPayment()" [disabled]="processing || amountToPay <= 0" class="btn-collect">
+        <button type="button" (click)="collectPayment()" [disabled]="!hasEditAccess || processing || amountToPay <= 0" class="btn-collect">
           {{ processing ? 'Processing...' : 'Collect Payment' }}
         </button>
       </div>

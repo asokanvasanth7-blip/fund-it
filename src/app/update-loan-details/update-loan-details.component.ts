@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AccountDetails, AccountDetailsList } from '../models/account-details.model';
 import { FirestoreService } from '../services/firestore.service';
 import Swal from 'sweetalert2';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-update-loan-details',
@@ -19,15 +20,20 @@ export class UpdateLoanDetailsComponent implements OnInit {
   error: string | null = null;
   selectedAccount: AccountDetails | null = null;
   searchTerm: string = '';
+  hasEditAccess: boolean = false;
 
   // Form fields
   newLoanAmount: number = 0;
   updateReason: string = '';
   isUpdating: boolean = false;
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private firestoreService: FirestoreService,
+    private authService: AuthService
+  ) {}
 
   async ngOnInit() {
+    this.hasEditAccess = this.authService.hasEditAccess();
     await this.loadAccounts();
   }
 
@@ -86,6 +92,16 @@ export class UpdateLoanDetailsComponent implements OnInit {
   }
 
   async updateLoanAmount() {
+    if (!this.hasEditAccess) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to update loan details',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
     if (!this.selectedAccount) {
       return;
     }

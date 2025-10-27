@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountDetails, AccountDetailsList, PaymentEntry } from '../models/account-details.model';
 import { FirestoreService } from '../services/firestore.service';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-payment-collection',
@@ -23,6 +24,7 @@ export class PaymentCollectionComponent implements OnInit {
   paymentSuccess: boolean = false;
   paymentError: string | null = null;
   searchTerm: string = '';
+  hasEditAccess: boolean = false;
 
   // Payment form fields
   amountToPay: number = 0;
@@ -30,9 +32,13 @@ export class PaymentCollectionComponent implements OnInit {
   paymentMethod: string = 'cash';
   paymentNotes: string = '';
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private firestoreService: FirestoreService,
+    private authService: AuthService
+  ) {}
 
   async ngOnInit() {
+    this.hasEditAccess = this.authService.hasEditAccess();
     await this.loadAccounts();
     this.setTodayDate();
   }
@@ -120,6 +126,11 @@ export class PaymentCollectionComponent implements OnInit {
   }
 
   async collectPayment() {
+    if (!this.hasEditAccess) {
+      this.paymentError = 'You do not have permission to collect payments';
+      return;
+    }
+
     if (!this.selectedAccount || !this.selectedPayment) {
       return;
     }

@@ -8,7 +8,8 @@
     <div class="actions">
       <button
         (click)="uploadDueSchedule()"
-        [disabled]="uploading"
+        [disabled]="!hasEditAccess || uploading"
+        [title]="!hasEditAccess ? 'You do not have permission to upload data' : ''"
         class="btn btn-primary">
         {{ uploading ? 'Uploading...' : 'Upload Due Schedule to Firebase' }}
       </button>
@@ -41,7 +42,8 @@
 
     <div class="actions">
       <button
-        (click)="uploadAccountDetails()"
+        [disabled]="!hasEditAccess || accountUploading"
+        [title]="!hasEditAccess ? 'You do not have permission to upload data' : ''"
         [disabled]="accountUploading"
         class="btn btn-primary">
         {{ accountUploading ? 'Uploading...' : 'Upload Account Details to Firebase' }}

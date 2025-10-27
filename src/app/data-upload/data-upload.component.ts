@@ -1,7 +1,7 @@
-
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirestoreService } from '../services/firestore.service';
+import { AuthService } from '../services/auth.service';
 import { DueScheduleList } from '../models/due-schedule.model';
 import { AccountDetailsList } from '../models/account-details.model';
 import dueScheduleData from '../../assets/due-schedule.mock.json';
@@ -14,7 +14,7 @@ import accountDetailsData from '../../assets/account-details.mock.json';
   templateUrl: './data-upload.component.html',
   styleUrls: ['./data-upload.component.css']
 })
-export class DataUploadComponent {
+export class DataUploadComponent implements OnInit {
   uploading = false;
   uploadComplete = false;
   uploadError: string | null = null;
@@ -24,10 +24,24 @@ export class DataUploadComponent {
   accountUploadComplete = false;
   accountUploadError: string | null = null;
   accountUploadedCount = 0;
+  hasEditAccess: boolean = false;
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private firestoreService: FirestoreService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.hasEditAccess = this.authService.hasEditAccess();
+  }
 
   async uploadDueSchedule() {
+    if (!this.hasEditAccess) {
+      this.uploadError = 'You do not have permission to upload data';
+      alert('Access Denied: You do not have permission to upload data');
+      return;
+    }
+
     this.uploading = true;
     this.uploadComplete = false;
     this.uploadError = null;
@@ -68,6 +82,12 @@ export class DataUploadComponent {
   }
 
   async uploadAccountDetails() {
+    if (!this.hasEditAccess) {
+      this.accountUploadError = 'You do not have permission to upload data';
+      alert('Access Denied: You do not have permission to upload data');
+      return;
+    }
+
     this.accountUploading = true;
     this.accountUploadComplete = false;
     this.accountUploadError = null;
@@ -107,3 +127,4 @@ export class DataUploadComponent {
     }
   }
 }
+

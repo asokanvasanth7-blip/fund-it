@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FirestoreService } from '../services/firestore.service';
+import { AuthService } from '../services/auth.service';
 import { AccountDetails, AccountDetailsList } from '../models/account-details.model';
 import Swal from 'sweetalert2';
 
@@ -28,13 +29,19 @@ export class LoanRepaymentComponent implements OnInit {
   selectedAccount: AccountDetails | null = null;
   searchTerm = '';
   processing = false;
+  hasEditAccess: boolean = false;
 
   // Repayment form fields
   repaymentAmount: number = 0;
   repaymentDate: string = '';
   repaymentNotes: string = '';
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private firestoreService: FirestoreService,
+    private authService: AuthService
+  ) {
+    this.hasEditAccess = this.authService.hasEditAccess();
+  }
 
   async ngOnInit() {
     await this.loadAccounts();
@@ -110,11 +117,22 @@ export class LoanRepaymentComponent implements OnInit {
   clearSelection() {
     this.selectedAccount = null;
     this.repaymentAmount = 0;
+
     this.repaymentNotes = '';
     this.setTodayDate();
   }
 
   async processRepayment() {
+    if (!this.hasEditAccess) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You do not have permission to process loan repayments',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
     if (!this.selectedAccount) {
       Swal.fire({
         icon: 'warning',

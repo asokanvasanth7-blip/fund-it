@@ -115,7 +115,7 @@
                 [(ngModel)]="repaymentAmount"
                 class="form-input"
                 placeholder="Enter amount"
-                [disabled]="processing"
+                [disabled]="!hasEditAccess || processing"
                 min="0"
                 [max]="selectedAccount.loan_amount"
               />
@@ -123,7 +123,7 @@
                 type="button"
                 class="btn-quick-fill"
                 (click)="setFullRepayment()"
-                [disabled]="processing"
+                [disabled]="!hasEditAccess || processing"
                 title="Full Repayment"
               >
                 Full
@@ -143,7 +143,7 @@
               type="date"
               [(ngModel)]="repaymentDate"
               class="form-input"
-              [disabled]="processing"
+              [disabled]="!hasEditAccess || processing"
             />
           </div>
 
@@ -159,7 +159,7 @@
               class="form-textarea"
               placeholder="Add any notes about this repayment..."
               rows="3"
-              [disabled]="processing"
+              [disabled]="!hasEditAccess || processing"
             ></textarea>
           </div>
 
@@ -192,7 +192,8 @@
             <button
               class="btn btn-primary"
               (click)="processRepayment()"
-              [disabled]="processing || !repaymentAmount || repaymentAmount <= 0"
+              [disabled]="!hasEditAccess || processing || !repaymentAmount || repaymentAmount <= 0"
+              [title]="!hasEditAccess ? 'You do not have permission to process loan repayments' : ''"
             >
               <span *ngIf="!processing">💳 Process Repayment</span>
               <span *ngIf="processing">⏳ Processing...</span>
