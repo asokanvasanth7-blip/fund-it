@@ -66,6 +66,11 @@ export class PaymentCollectionComponent implements OnInit {
             a.account.localeCompare(b.account)
           );
         this.filteredAccounts = [...this.accounts];
+
+        // Automatically select the first account
+        if (this.filteredAccounts.length > 0) {
+          this.selectedAccount = this.filteredAccounts[0];
+        }
       } else {
         await this.loadMockData();
       }
@@ -83,6 +88,11 @@ export class PaymentCollectionComponent implements OnInit {
       const response = await fetch('/assets/account-details.mock.json');
       this.accounts = await response.json();
       this.filteredAccounts = [...this.accounts];
+
+      // Automatically select the first account
+      if (this.filteredAccounts.length > 0) {
+        this.selectedAccount = this.filteredAccounts[0];
+      }
     } catch (err) {
       console.error('Error loading mock data:', err);
     }
