@@ -237,6 +237,103 @@
   text-align: center;
 }
 
+/* Current Month Due Statistics Section */
+.current-month-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.current-month-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.month-stat-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+}
+
+.month-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #cbd5e0;
+}
+
+.month-stat-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.month-icon-total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.month-icon-paid {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.month-icon-balance {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+}
+
+.month-icon-paid-accounts {
+  background: linear-gradient(135deg, #17a2b8 0%, #0056b3 100%);
+}
+
+.month-icon-unpaid-accounts {
+  background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
+}
+
+.month-stat-icon {
+  filter: brightness(1.1);
+}
+
+.month-stat-details {
+  flex: 1;
+}
+
+.month-stat-label {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.month-stat-value {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.month-stat-value.success {
+  color: #28a745;
+}
+
+.month-stat-value.warning {
+  color: #ffc107;
+}
+
 /* Info Grid */
 .info-grid {
   display: grid;

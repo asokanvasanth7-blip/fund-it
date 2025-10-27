@@ -88,6 +88,62 @@
       </div>
     </div>
 
+    <!-- Current Month Due Statistics -->
+    <div class="current-month-section">
+      <h2 class="section-title">📊 Current Month Due Details</h2>
+      <div class="current-month-grid">
+        <div class="month-stat-card">
+          <div class="month-stat-icon-wrapper month-icon-total">
+            <span class="month-stat-icon">💳</span>
+          </div>
+          <div class="month-stat-details">
+            <p class="month-stat-label">Total Due Amount</p>
+            <h3 class="month-stat-value">₹{{ currentMonthTotalDue | number:'1.0-0' }}</h3>
+          </div>
+        </div>
+
+        <div class="month-stat-card">
+          <div class="month-stat-icon-wrapper month-icon-paid">
+            <span class="month-stat-icon">✅</span>
+          </div>
+          <div class="month-stat-details">
+            <p class="month-stat-label">Paid Amount</p>
+            <h3 class="month-stat-value success">₹{{ currentMonthPaidAmount | number:'1.0-0' }}</h3>
+          </div>
+        </div>
+
+        <div class="month-stat-card">
+          <div class="month-stat-icon-wrapper month-icon-balance">
+            <span class="month-stat-icon">⚠️</span>
+          </div>
+          <div class="month-stat-details">
+            <p class="month-stat-label">Balance Due Amount</p>
+            <h3 class="month-stat-value warning">₹{{ currentMonthBalanceAmount | number:'1.0-0' }}</h3>
+          </div>
+        </div>
+
+        <div class="month-stat-card">
+          <div class="month-stat-icon-wrapper month-icon-paid-accounts">
+            <span class="month-stat-icon">👥</span>
+          </div>
+          <div class="month-stat-details">
+            <p class="month-stat-label">Paid Accounts</p>
+            <h3 class="month-stat-value">{{ currentMonthPaidAccountsCount }}</h3>
+          </div>
+        </div>
+
+        <div class="month-stat-card">
+          <div class="month-stat-icon-wrapper month-icon-unpaid-accounts">
+            <span class="month-stat-icon">⏳</span>
+          </div>
+          <div class="month-stat-details">
+            <p class="month-stat-label">Unpaid Accounts</p>
+            <h3 class="month-stat-value">{{ currentMonthUnpaidAccountsCount }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Recent Information -->
     <div class="info-grid">
       <!-- Recent Payments -->

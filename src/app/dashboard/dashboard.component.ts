@@ -23,6 +23,13 @@ export class DashboardComponent implements OnInit {
   availableFunds: number = 0;
   totalPendingDues: number = 0;
 
+  // Current Month Due Statistics
+  currentMonthTotalDue: number = 0;
+  currentMonthPaidAmount: number = 0;
+  currentMonthBalanceAmount: number = 0;
+  currentMonthPaidAccountsCount: number = 0;
+  currentMonthUnpaidAccountsCount: number = 0;
+
   // Recent activities
   recentPayments: any[] = [];
   upcomingDues: any[] = [];
@@ -61,6 +68,9 @@ export class DashboardComponent implements OnInit {
 
       // Load recent payments from payment history
       await this.loadRecentPayments(accountsData);
+
+      // Calculate current month due statistics
+      this.calculateCurrentMonthDueStats(accountsData);
 
       // Load due schedule
       try {
@@ -127,6 +137,64 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
       console.error('Error loading recent payments:', error);
       this.recentPayments = [];
+    }
+  }
+
+  calculateCurrentMonthDueStats(accountsData: any[]) {
+    try {
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      let totalDue = 0;
+      let paidAmount = 0;
+      const paidAccounts = new Set<string>();
+      const unpaidAccounts = new Set<string>();
+
+      accountsData.forEach((account: any) => {
+        if (account.due_payments && Array.isArray(account.due_payments)) {
+          let accountHasPaidCurrentMonth = false;
+          let accountHasUnpaidCurrentMonth = false;
+
+          account.due_payments.forEach((payment: any) => {
+            // Check if payment is for current month
+            const dueDate = payment.due_date ? new Date(payment.due_date) : null;
+
+            if (dueDate && dueDate.getMonth() === currentMonth && dueDate.getFullYear() === currentYear) {
+              totalDue += payment.due_amount || 0;
+
+              if (payment.payment_status === 'paid' || payment.payment_status === 'partial') {
+                paidAmount += payment.paid_amount || 0;
+                accountHasPaidCurrentMonth = true;
+
+                // If partial payment, still consider it as having unpaid balance
+                if (payment.payment_status === 'partial') {
+                  accountHasUnpaidCurrentMonth = true;
+                }
+              } else {
+                accountHasUnpaidCurrentMonth = true;
+              }
+            }
+          });
+
+          // Count unique accounts
+          if (accountHasPaidCurrentMonth && !accountHasUnpaidCurrentMonth) {
+            paidAccounts.add(account.account);
+          }
+          if (accountHasUnpaidCurrentMonth) {
+            unpaidAccounts.add(account.account);
+          }
+        }
+      });
+
+      this.currentMonthTotalDue = totalDue;
+      this.currentMonthPaidAmount = paidAmount;
+      this.currentMonthBalanceAmount = totalDue - paidAmount;
+      this.currentMonthPaidAccountsCount = paidAccounts.size;
+      this.currentMonthUnpaidAccountsCount = unpaidAccounts.size;
+
+    } catch (error) {
+      console.error('Error calculating current month due stats:', error);
     }
   }
 
