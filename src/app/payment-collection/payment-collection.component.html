@@ -103,7 +103,11 @@
           </div>
           <div class="account-stats">
             <div class="stat-item">
-              <span class="stat-label">Pending Payments:</span>
+              <span class="stat-label">Total Payments:</span>
+              <span class="stat-value">{{ selectedAccount.due_payments?.length || 0 }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Pending:</span>
               <span class="stat-value">{{ getPendingPayments(selectedAccount).length }}</span>
             </div>
             <div class="stat-item">
@@ -113,11 +117,42 @@
           </div>
         </div>
 
-        <div *ngIf="getPendingPayments(selectedAccount).length === 0" class="no-pending">
-          <p>✅ All payments are completed for this account!</p>
+        <!-- Filter Options -->
+        <div class="filter-section">
+          <label class="filter-label">Filter by Status:</label>
+          <div class="filter-buttons">
+            <button
+              [class.active]="paymentFilter === 'all'"
+              (click)="paymentFilter = 'all'"
+              class="filter-btn">
+              All ({{ selectedAccount.due_payments?.length || 0 }})
+            </button>
+            <button
+              [class.active]="paymentFilter === 'pending'"
+              (click)="paymentFilter = 'pending'"
+              class="filter-btn">
+              Pending ({{ getPendingCount(selectedAccount) }})
+            </button>
+            <button
+              [class.active]="paymentFilter === 'partial'"
+              (click)="paymentFilter = 'partial'"
+              class="filter-btn">
+              Partial ({{ getPartialCount(selectedAccount) }})
+            </button>
+            <button
+              [class.active]="paymentFilter === 'paid'"
+              (click)="paymentFilter = 'paid'"
+              class="filter-btn">
+              Paid ({{ getPaidCount(selectedAccount) }})
+            </button>
+          </div>
         </div>
 
-        <div *ngIf="getPendingPayments(selectedAccount).length > 0">
+        <div *ngIf="getFilteredPayments(selectedAccount).length === 0" class="no-pending">
+          <p>📭 No payments found for the selected filter.</p>
+        </div>
+
+        <div *ngIf="getFilteredPayments(selectedAccount).length > 0">
           <!-- Desktop Table View -->
           <div class="table-container desktop-view">
             <table class="payments-table">
@@ -133,7 +168,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let payment of getPendingPayments(selectedAccount)">
+                <tr *ngFor="let payment of getFilteredPayments(selectedAccount)">
                   <td class="center">{{ payment.due_no }}</td>
                   <td>{{ payment.due_date }}</td>
                   <td class="amount">₹{{ payment.total | number:'1.2-2' }}</td>
@@ -145,13 +180,28 @@
                     </span>
                   </td>
                   <td class="center">
-                    <button
-                      (click)="openPaymentModal(payment)"
-                      class="collect-btn"
-                      [disabled]="!hasEditAccess || !canCollectPayment(payment)"
-                      [title]="!hasEditAccess ? 'You do not have permission to collect payments' : (!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due')">
-                      💰 Collect Payment
-                    </button>
+                    <div class="action-buttons">
+                      <button
+                        *ngIf="payment.payment_status !== 'paid' && getRemainingBalance(payment) > 0"
+                        (click)="openPaymentModal(payment)"
+                        class="collect-btn"
+                        [disabled]="!hasEditAccess || !canCollectPayment(payment)"
+                        [title]="!hasEditAccess ? 'You do not have permission to collect payments' : (!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due')">
+                        💰 Collect
+                      </button>
+                      <button
+                        (click)="sendWhatsAppReceipt(payment)"
+                        class="whatsapp-btn"
+                        title="Send receipt via WhatsApp">
+                        📱 WhatsApp
+                      </button>
+                      <button
+                        (click)="exportPDFReceipt(payment)"
+                        class="pdf-btn"
+                        title="Export receipt as PDF">
+                        📄 PDF
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -160,7 +210,7 @@
 
           <!-- Mobile Card View -->
           <div class="mobile-cards-container mobile-view">
-            <div *ngFor="let payment of getPendingPayments(selectedAccount)" class="payment-card">
+            <div *ngFor="let payment of getFilteredPayments(selectedAccount)" class="payment-card">
               <div class="payment-card-header">
                 <div class="payment-due-number">Due #{{ payment.due_no }}</div>
                 <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
@@ -192,11 +242,24 @@
 
               <div class="payment-card-footer">
                 <button
+                  *ngIf="payment.payment_status !== 'paid' && getRemainingBalance(payment) > 0"
                   (click)="openPaymentModal(payment)"
                   class="collect-btn-mobile"
                   [disabled]="!hasEditAccess || !canCollectPayment(payment)"
                   [title]="!hasEditAccess ? 'You do not have permission to collect payments' : (!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due')">
-                  💰 Collect Payment
+                  💰 Collect
+                </button>
+                <button
+                  (click)="sendWhatsAppReceipt(payment)"
+                  class="whatsapp-btn-mobile"
+                  title="Send receipt via WhatsApp">
+                  📱 WhatsApp
+                </button>
+                <button
+                  (click)="exportPDFReceipt(payment)"
+                  class="pdf-btn-mobile"
+                  title="Export receipt as PDF">
+                  📄 PDF
                 </button>
               </div>
             </div>

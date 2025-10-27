@@ -25,6 +25,7 @@ export class PaymentCollectionComponent implements OnInit {
   paymentError: string | null = null;
   searchTerm: string = '';
   hasEditAccess: boolean = false;
+  paymentFilter: string = 'all'; // 'all', 'pending', 'paid', 'partial'
 
   // Payment form fields
   amountToPay: number = 0;
@@ -226,6 +227,31 @@ export class PaymentCollectionComponent implements OnInit {
     );
   }
 
+  getFilteredPayments(account: AccountDetails): PaymentEntry[] {
+    if (this.paymentFilter === 'all') {
+      return account.due_payments || [];
+    } else if (this.paymentFilter === 'pending') {
+      return account.due_payments.filter(p => p.payment_status === 'pending' || p.payment_status === 'overdue');
+    } else if (this.paymentFilter === 'paid') {
+      return account.due_payments.filter(p => p.payment_status === 'paid');
+    } else if (this.paymentFilter === 'partial') {
+      return account.due_payments.filter(p => p.payment_status === 'partial');
+    }
+    return account.due_payments || [];
+  }
+
+  getPendingCount(account: AccountDetails): number {
+    return account.due_payments?.filter(p => p.payment_status === 'pending' || p.payment_status === 'overdue').length || 0;
+  }
+
+  getPartialCount(account: AccountDetails): number {
+    return account.due_payments?.filter(p => p.payment_status === 'partial').length || 0;
+  }
+
+  getPaidCount(account: AccountDetails): number {
+    return account.due_payments?.filter(p => p.payment_status === 'paid').length || 0;
+  }
+
   getTotalPendingAmount(account: AccountDetails): number {
     return this.getPendingPayments(account).reduce((sum, p) => sum + (p.total - p.paid_amount), 0);
   }
@@ -332,5 +358,258 @@ export class PaymentCollectionComponent implements OnInit {
 
     const index = Math.abs(hash) % colors.length;
     return colors[index];
+  }
+
+  // Send WhatsApp receipt
+  sendWhatsAppReceipt(payment: PaymentEntry) {
+    if (!this.selectedAccount) return;
+
+    const account = this.selectedAccount;
+    const mobile = account.mobile || '';
+
+    if (!mobile) {
+      alert('Mobile number not available for this account');
+      return;
+    }
+
+    // Clean mobile number (remove spaces, dashes, etc.)
+    const cleanMobile = mobile.replace(/\D/g, '');
+
+    // Generate receipt message
+    const receiptMessage = this.generateReceiptMessage(account, payment);
+
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(receiptMessage);
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = `https://wa.me/91${cleanMobile}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  }
+
+  // Generate receipt message text
+  generateReceiptMessage(account: AccountDetails, payment: PaymentEntry): string {
+    const message = `
+*PAYMENT RECEIPT*
+━━━━━━━━━━━━━━━━━━━━
+
+*Account Details:*
+Name: ${account.name}
+Account ID: ${account.account}
+Mobile: ${account.mobile || 'N/A'}
+
+*Payment Details:*
+Due No: ${payment.due_no}
+Due Date: ${payment.due_date}
+Total Due: ₹${payment.total.toFixed(2)}
+Paid Amount: ₹${payment.paid_amount.toFixed(2)}
+Balance: ₹${(payment.total - payment.paid_amount).toFixed(2)}
+Status: ${payment.payment_status.toUpperCase()}
+
+━━━━━━━━━━━━━━━━━━━━
+*Thank you for your payment!*
+
+Generated on: ${new Date().toLocaleDateString('en-IN')}
+    `.trim();
+
+    return message;
+  }
+
+  // Export PDF receipt
+  exportPDFReceipt(payment: PaymentEntry) {
+    if (!this.selectedAccount) return;
+
+    const account = this.selectedAccount;
+
+    // Create a printable receipt HTML
+    const receiptHTML = this.generateReceiptHTML(account, payment);
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(receiptHTML);
+      printWindow.document.close();
+
+      // Wait for content to load, then print
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+    }
+  }
+
+  // Generate receipt HTML for PDF
+  generateReceiptHTML(account: AccountDetails, payment: PaymentEntry): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Receipt - ${account.name}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+    .receipt-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .receipt-header {
+      text-align: center;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .receipt-header h1 {
+      color: #667eea;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    .receipt-header p {
+      color: #666;
+      font-size: 16px;
+    }
+    .receipt-section {
+      margin-bottom: 25px;
+    }
+    .receipt-section h2 {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 8px;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+    .receipt-label {
+      font-weight: 600;
+      color: #555;
+    }
+    .receipt-value {
+      color: #333;
+      text-align: right;
+    }
+    .receipt-total {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .receipt-total .receipt-row {
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-paid { background: #d4edda; color: #155724; }
+    .status-partial { background: #fff3cd; color: #856404; }
+    .status-pending { background: #f8d7da; color: #721c24; }
+    .receipt-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #eee;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .receipt-container { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-container">
+    <div class="receipt-header">
+      <h1>💰 PAYMENT RECEIPT</h1>
+      <p>Official Payment Acknowledgement</p>
+    </div>
+
+    <div class="receipt-section">
+      <h2>Account Information</h2>
+      <div class="receipt-row">
+        <span class="receipt-label">Account Name:</span>
+        <span class="receipt-value">${account.name}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Account ID:</span>
+        <span class="receipt-value">${account.account}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Mobile Number:</span>
+        <span class="receipt-value">${account.mobile || 'N/A'}</span>
+      </div>
+    </div>
+
+    <div class="receipt-section">
+      <h2>Payment Details</h2>
+      <div class="receipt-row">
+        <span class="receipt-label">Due Number:</span>
+        <span class="receipt-value">#${payment.due_no}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Due Date:</span>
+        <span class="receipt-value">${payment.due_date}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Total Due Amount:</span>
+        <span class="receipt-value">₹${payment.total.toFixed(2)}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Paid Amount:</span>
+        <span class="receipt-value">₹${payment.paid_amount.toFixed(2)}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Balance Amount:</span>
+        <span class="receipt-value">₹${(payment.total - payment.paid_amount).toFixed(2)}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Payment Status:</span>
+        <span class="receipt-value">
+          <span class="status-badge status-${payment.payment_status}">${payment.payment_status.toUpperCase()}</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="receipt-total">
+      <div class="receipt-row">
+        <span class="receipt-label">Current Fund Balance:</span>
+        <span class="receipt-value">₹${account.fund_amount.toFixed(2)}</span>
+      </div>
+    </div>
+
+    <div class="receipt-footer">
+      <p>Generated on: ${new Date().toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</p>
+      <p style="margin-top: 10px;">Thank you for your payment!</p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
   }
 }

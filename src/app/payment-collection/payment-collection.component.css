@@ -434,6 +434,53 @@
   font-size: 1.1rem;
 }
 
+/* Filter Section */
+.filter-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.filter-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.75rem;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  background: white;
+  color: #495057;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
 /* Table */
 .table-container {
   overflow-x: auto;
@@ -517,17 +564,27 @@
   color: #721c24;
 }
 
+/* Action Buttons Container */
+.action-buttons {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
 /* Collect Button */
 .collect-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.813rem;
   font-weight: 600;
   transition: transform 0.2s;
+  white-space: nowrap;
 }
 
 .collect-btn:hover:not(:disabled) {
@@ -542,6 +599,44 @@
   opacity: 1;
   transform: none;
   font-weight: 600;
+}
+
+/* WhatsApp Button */
+.whatsapp-btn {
+  padding: 0.5rem 0.65rem;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.813rem;
+  font-weight: 600;
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
+}
+
+/* PDF Export Button */
+.pdf-btn {
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.813rem;
+  font-weight: 600;
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+
+.pdf-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 /* Modal */
@@ -865,6 +960,9 @@ textarea.form-control {
   padding: 1rem 1.25rem;
   background: #f8f9fa;
   border-top: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .collect-btn-mobile {
@@ -893,6 +991,46 @@ textarea.form-control {
   opacity: 0.6;
   transform: none;
   box-shadow: none;
+}
+
+/* WhatsApp Button Mobile */
+.whatsapp-btn-mobile {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2);
+}
+
+.whatsapp-btn-mobile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+/* PDF Export Button Mobile */
+.pdf-btn-mobile {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+.pdf-btn-mobile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 /* Responsive */
