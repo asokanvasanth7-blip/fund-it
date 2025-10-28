@@ -19,6 +19,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Clean npm cache and remove node_modules
+        run: |
+          echo "Cleaning npm cache and removing any existing node_modules to avoid locked files and stale state"
+          npm cache clean --force
+          if [ -d "node_modules" ]; then rm -rf node_modules; fi
+
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
