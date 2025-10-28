@@ -35,4 +35,3 @@ jobs:
           local-dir: ./dist/fund-it/browser/
           server-dir: ./
           dangerous-clean-slate: false
-
