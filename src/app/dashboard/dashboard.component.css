@@ -337,7 +337,7 @@
 /* Info Grid */
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
 }
 
@@ -387,11 +387,14 @@
 .data-table-container {
   overflow-x: auto;
   margin-top: 1rem;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 100%;
 }
 
 .data-table thead {
@@ -549,6 +552,20 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .current-month-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
@@ -567,30 +584,117 @@
     font-size: 1.5rem;
   }
 
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
+  .stat-card {
+    padding: 1.25rem;
   }
 
   .stat-value {
     font-size: 1.5rem;
   }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .quick-action-btn {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .action-icon {
+    font-size: 2rem;
+  }
+
+  .action-label {
+    font-size: 0.85rem;
+  }
+
+  .current-month-section {
+    padding: 1.5rem;
+  }
+
+  .current-month-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .month-stat-card {
+    padding: 1.25rem;
+  }
+
+  .month-stat-value {
+    font-size: 1.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .info-card {
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .info-card-title {
+    font-size: 1.1rem;
+  }
+
+  .data-table {
+    font-size: 0.875rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .quick-actions-section {
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .quick-actions-grid {
-    grid-template-columns: 1fr;
+  .dashboard-container {
+    padding: 0.75rem;
+  }
+
+  .page-header {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+  }
+
+  .logout-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .stats-grid {
+    gap: 0.75rem;
   }
 
   .stat-card {
     padding: 1rem;
+    gap: 1rem;
   }
 
   .stat-icon-wrapper {
@@ -598,5 +702,132 @@
     height: 50px;
     font-size: 1.5rem;
   }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .quick-action-btn {
+    padding: 1rem 0.75rem;
+  }
+
+  .action-icon {
+    font-size: 1.75rem;
+  }
+
+  .action-label {
+    font-size: 0.8rem;
+  }
+
+  .current-month-section,
+  .quick-actions-section,
+  .info-card {
+    padding: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .current-month-grid {
+    gap: 0.75rem;
+  }
+
+  .month-stat-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .month-stat-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .month-stat-label {
+    font-size: 0.75rem;
+  }
+
+  .month-stat-value {
+    font-size: 1.25rem;
+  }
+
+  .info-card-header {
+    margin-bottom: 1rem;
+  }
+
+  .info-card-title {
+    font-size: 1rem;
+  }
+
+  .view-all-link {
+    font-size: 0.85rem;
+  }
+
+  .data-table {
+    font-size: 0.813rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.625rem 0.375rem;
+  }
+
+  .data-table th {
+    font-size: 0.75rem;
+  }
+
+  .payment-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .pending-alert {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.875rem;
+  }
 }
+
+@media (max-width: 360px) {
+  .page-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .month-stat-value {
+    font-size: 1.1rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
 
