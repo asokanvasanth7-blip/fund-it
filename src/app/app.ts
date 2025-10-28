@@ -1,7 +1,9 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { Component, signal, HostListener, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { PwaUpdateService } from './services/pwa-update.service';
+import { PwaInstallService } from './services/pwa-install.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -10,16 +12,19 @@ import { filter } from 'rxjs/operators';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit {
   protected readonly title = signal('fund-it');
   user$;
   sidebarCollapsed = false;
   isMobile = false;
   profileDropdownOpen = false;
+  showInstallPrompt = false;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private pwaUpdateService: PwaUpdateService,
+    private pwaInstallService: PwaInstallService
   ) {
     this.user$ = this.authService.user$;
     // Check if mobile view on init
@@ -31,6 +36,21 @@ export class App {
     ).subscribe(() => {
       if (this.isMobile) {
         this.sidebarCollapsed = true;
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    // Initialize PWA update service
+    this.pwaUpdateService.init();
+
+    // Check if we should show install prompt
+    this.pwaInstallService.canInstall$.subscribe(canInstall => {
+      if (canInstall && this.pwaInstallService.shouldShowInstallPrompt()) {
+        // Show install prompt after a delay (3 seconds)
+        setTimeout(() => {
+          this.showInstallPrompt = true;
+        }, 3000);
       }
     });
   }
@@ -97,5 +117,22 @@ export class App {
     } catch (error) {
       console.error('Logout error:', error);
     }
+  }
+
+  // PWA Install Methods
+  async installPwa() {
+    const installed = await this.pwaInstallService.promptInstall();
+    if (installed) {
+      this.showInstallPrompt = false;
+    }
+  }
+
+  dismissInstallPrompt() {
+    this.showInstallPrompt = false;
+    localStorage.setItem('pwa-install-prompt-shown', Date.now().toString());
+  }
+
+  get isStandalone(): boolean {
+    return this.pwaInstallService.isStandalone();
   }
 }

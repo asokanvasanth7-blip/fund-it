@@ -206,3 +206,18 @@
 <!-- Mobile Overlay -->
 <div class="sidebar-overlay" [class.active]="!sidebarCollapsed" (click)="toggleSidebar()"></div>
 
+<!-- PWA Install Prompt -->
+<div class="pwa-install-banner" *ngIf="showInstallPrompt && !isStandalone">
+  <div class="pwa-install-content">
+    <div class="pwa-install-icon">📱</div>
+    <div class="pwa-install-text">
+      <h4>Install FundIt App</h4>
+      <p>Get quick access and work offline</p>
+    </div>
+    <div class="pwa-install-actions">
+      <button class="pwa-install-btn" (click)="installPwa()">Install</button>
+      <button class="pwa-dismiss-btn" (click)="dismissInstallPrompt()">✕</button>
+    </div>
+  </div>
+</div>
+
