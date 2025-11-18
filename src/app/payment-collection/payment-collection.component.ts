@@ -430,6 +430,32 @@ export class PaymentCollectionComponent implements OnInit {
     window.open(whatsappUrl, '_blank');
   }
 
+  // Send WhatsApp payment reminder
+  sendPaymentReminder(payment: PaymentEntry) {
+    if (!this.selectedAccount) return;
+
+    const account = this.selectedAccount;
+    const mobile = account.mobile || '';
+
+    if (!mobile) {
+      alert('Mobile number not available for this account');
+      return;
+    }
+
+    // Clean mobile number (remove spaces, dashes, etc.)
+    const cleanMobile = mobile.replace(/\D/g, '');
+
+    // Generate reminder message
+    const reminderMessage = this.generatePaymentReminderMessage(account, payment);
+
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(reminderMessage);
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = `https://wa.me/91${cleanMobile}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  }
+
   // Generate receipt message text
   generateReceiptMessage(account: AccountDetails, payment: PaymentEntry): string {
     const collectedOnText = payment.collected_on
@@ -473,6 +499,64 @@ export class PaymentCollectionComponent implements OnInit {
       minute: '2-digit'
     })}
 
+_Azhisukkudi Amavasai Fund_
+    `.trim();
+
+    return message;
+  }
+
+  // Generate payment reminder message
+  generatePaymentReminderMessage(account: AccountDetails, payment: PaymentEntry): string {
+    const balance = payment.total - payment.paid_amount;
+    const statusEmoji = balance > 0 ? '⚠️' : '✅';
+    const urgencyEmoji = payment.payment_status === 'overdue' ? '🚨' : '📢';
+
+    let urgencyText = '';
+    if (payment.payment_status === 'overdue') {
+      urgencyText = '🚨 *OVERDUE PAYMENT* 🚨\n';
+    } else if (payment.payment_status === 'partial') {
+      urgencyText = '⚠️ *PARTIAL PAYMENT PENDING* ⚠️\n';
+    } else {
+      urgencyText = '📢 *PAYMENT REMINDER* 📢\n';
+    }
+
+    const message = `
+${urgencyEmoji} *Azhisukkudi Amavasai Fund*
+${urgencyText}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🙏 Dear *${account.name}*,
+
+This is a friendly reminder about your upcoming/pending payment.
+
+👤 *Account Details*
+├ Account ID: \`${account.account}\`
+└ Mobile: ${account.mobile || 'N/A'}
+
+💰 *Payment Information*
+├ Due No: \`#${payment.due_no}\`
+├ Due Date: *${payment.due_date}*
+├ Total Due: ₹*${payment.total.toFixed(2)}*
+├ Paid Amount: ₹*${payment.paid_amount.toFixed(2)}*
+└ Balance Due: ${statusEmoji} ₹*${balance.toFixed(2)}*
+
+${balance > 0 ? '⏰ *Kindly make the payment at your earliest convenience.*' : '✅ *Payment completed. Thank you!*'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 *Contact for Payment:*
+*Sathish Kumar Ramalingam*
+*+91-8973576694*
+
+📅 Reminder sent: ${new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}
+
+_Thank you for your cooperation!_
 _Azhisukkudi Amavasai Fund_
     `.trim();
 

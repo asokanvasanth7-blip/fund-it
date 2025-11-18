@@ -192,6 +192,13 @@
                         💰 Collect
                       </button>
                       <button
+                        *ngIf="getRemainingBalance(payment) > 0"
+                        (click)="sendPaymentReminder(payment)"
+                        class="reminder-btn"
+                        title="Send payment reminder via WhatsApp">
+                        🔔 Reminder
+                      </button>
+                      <button
                         (click)="sendWhatsAppReceipt(payment)"
                         class="whatsapp-btn"
                         title="Send receipt via WhatsApp">
@@ -255,6 +262,13 @@
                   [disabled]="!hasEditAccess || !canCollectPayment(payment)"
                   [title]="!hasEditAccess ? 'You do not have permission to collect payments' : (!canCollectPayment(payment) ? 'Payment collection only allowed for current month dues with valid due dates' : 'Collect payment for this due')">
                   💰 Collect
+                </button>
+                <button
+                  *ngIf="getRemainingBalance(payment) > 0"
+                  (click)="sendPaymentReminder(payment)"
+                  class="reminder-btn-mobile"
+                  title="Send payment reminder via WhatsApp">
+                  🔔 Reminder
                 </button>
                 <button
                   (click)="sendWhatsAppReceipt(payment)"
