@@ -163,6 +163,7 @@
                   <th>Total Due</th>
                   <th>Paid Amount</th>
                   <th>Balance</th>
+                  <th>Collected On</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -174,6 +175,7 @@
                   <td class="amount">₹{{ payment.total | number:'1.2-2' }}</td>
                   <td class="amount">₹{{ payment.paid_amount | number:'1.2-2' }}</td>
                   <td class="amount balance">₹{{ getRemainingBalance(payment) | number:'1.2-2' }}</td>
+                  <td class="center">{{ payment.collected_on ? (payment.collected_on | date:'medium') : '—' }}</td>
                   <td class="center">
                     <span [class]="'status-badge ' + getPaymentStatusClass(payment.payment_status)">
                       {{ payment.payment_status }}
@@ -237,6 +239,11 @@
                 <div class="payment-info-row highlight-row">
                   <span class="payment-label">⚖️ Balance</span>
                   <span class="payment-value balance-large">₹{{ getRemainingBalance(payment) | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="payment-info-row">
+                  <span class="payment-label">🗓️ Collected On</span>
+                  <span class="payment-value">{{ payment.collected_on ? (payment.collected_on | date:'medium') : '—' }}</span>
                 </div>
               </div>
 
@@ -374,4 +381,3 @@
     </div>
   </div>
 </div>
-

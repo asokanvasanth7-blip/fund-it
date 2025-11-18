@@ -1,0 +1,176 @@
+<div class="account-info-page" *ngIf="account; else loadingOrNotFound">
+  <!-- Navigation Header -->
+  <div class="page-nav">
+    <button (click)="goBack()" class="back-btn">
+      <span class="back-icon">←</span>
+      <span>Back to Accounts</span>
+    </button>
+  </div>
+
+  <!-- Account Header Card -->
+  <div class="account-header-card">
+    <div class="account-header-content">
+      <div class="account-info">
+        <div class="account-avatar">
+          <span class="avatar-icon">👤</span>
+        </div>
+        <div class="account-details">
+          <h1 class="account-title">{{ account.name }}</h1>
+          <div class="account-meta">
+            <span class="account-code">
+              <span class="meta-icon">🔖</span>
+              {{ account.account }}
+            </span>
+            <span class="account-mobile">
+              <span class="meta-icon">📱</span>
+              {{ account.mobile || 'N/A' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-fund">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-label">Fund Amount</div>
+          <div class="stat-value">₹{{ account.fund_amount | number:'1.2-2' }}</div>
+        </div>
+      </div>
+      <div class="stat-card stat-loan">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-label">Loan Amount</div>
+          <div class="stat-value">₹{{ account.loan_amount | number:'1.2-2' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Schedule Section -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">📅</span>
+        Payment Schedule
+      </h2>
+    </div>
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>Due No</th>
+              <th>Due Date</th>
+              <th>Due Amount</th>
+              <th>Loan Interest</th>
+              <th>Total</th>
+              <th>Paid</th>
+              <th>Balance</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of account.due_payments" [class.row-paid]="p.payment_status === 'paid'" [class.row-partial]="p.payment_status === 'partial'" [class.row-pending]="p.payment_status === 'pending'">
+              <td data-label="Due No">
+                <span class="due-number">#{{ p.due_no }}</span>
+              </td>
+              <td data-label="Due Date">{{ p.due_date }}</td>
+              <td data-label="Due Amount">
+                <span class="amount">₹{{ p.due_amount | number:'1.2-2' }}</span>
+              </td>
+              <td data-label="Loan Interest">
+                <span class="amount">₹{{ p.loan_interest | number:'1.2-2' }}</span>
+              </td>
+              <td data-label="Total">
+                <span class="amount amount-total">₹{{ p.total | number:'1.2-2' }}</span>
+              </td>
+              <td data-label="Paid">
+                <span class="amount amount-paid">₹{{ p.paid_amount | number:'1.2-2' }}</span>
+              </td>
+              <td data-label="Balance">
+                <span class="amount" [class.amount-balance]="p.balance_amount > 0">₹{{ p.balance_amount | number:'1.2-2' }}</span>
+              </td>
+              <td data-label="Status">
+                <span class="status-badge"
+                      [class.status-paid]="p.payment_status === 'paid'"
+                      [class.status-partial]="p.payment_status === 'partial'"
+                      [class.status-pending]="p.payment_status === 'pending'"
+                      [class.status-overdue]="p.payment_status === 'overdue'">
+                  <span class="status-dot"></span>
+                  {{ p.payment_status | titlecase }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loan History Section -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">📜</span>
+        Loan History
+      </h2>
+    </div>
+    <div class="section-content">
+      <div *ngIf="account.loan_history && account.loan_history.length > 0; else noHistory">
+        <div class="timeline">
+          <div *ngFor="let h of account.loan_history; let i = index" class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-number">{{ i + 1 }}</span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-user">
+                  <span class="user-icon">👤</span>
+                  <strong>{{ h.updated_by }}</strong>
+                </div>
+                <span class="timeline-date">
+                  <span class="date-icon">🕐</span>
+                  {{ h.updated_at | date:'medium' }}
+                </span>
+              </div>
+              <div class="timeline-body">
+                <div class="timeline-change">
+                  <span class="change-from">₹{{ h.old_loan_amount | number:'1.2-2' }}</span>
+                  <span class="change-arrow">→</span>
+                  <span class="change-to">₹{{ h.new_loan_amount | number:'1.2-2' }}</span>
+                </div>
+                <div *ngIf="h.reason" class="timeline-reason">
+                  <span class="reason-icon">💬</span>
+                  {{ h.reason }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noHistory>
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p class="empty-text">No loan history available</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrNotFound>
+  <div class="loading-wrap">
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p class="loading-text">Loading account details...</p>
+    </div>
+    <div *ngIf="!loading" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p class="error-text">Account not found</p>
+      <button (click)="goBack()" class="back-btn-error">Return to Accounts</button>
+    </div>
+  </div>
+</ng-template>

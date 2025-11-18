@@ -13,6 +13,7 @@ import { LoanRepaymentComponent } from './loan-repayment/loan-repayment.componen
 import { BulkFundUpdateComponent } from './bulk-fund-update/bulk-fund-update.component';
 import { authGuard } from './guards/auth.guard';
 import { publicGuard } from './guards/public.guard';
+import { AccountInformationsComponent } from './account-informations/account-informations.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [publicGuard] },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'upload', component: DataUploadComponent, canActivate: [authGuard] },
   { path: 'due-schedule', component: DueScheduleComponent, canActivate: [authGuard] },
   { path: 'account-details', component: AccountDetailsComponent, canActivate: [authGuard] },
+  { path: 'account-information/:accountId', component: AccountInformationsComponent, canActivate: [authGuard] },
   { path: 'update-due-details', component: UpdateDueDetailsComponent, canActivate: [authGuard] },
   { path: 'update-loan-details', component: UpdateLoanDetailsComponent, canActivate: [authGuard] },
   { path: 'payment-collection', component: PaymentCollectionComponent, canActivate: [authGuard] },

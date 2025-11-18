@@ -159,7 +159,7 @@ export class UpdateLoanDetailsComponent implements OnInit {
 
       // Find the account in Firestore
       const accountsData = await this.firestoreService.getAllDocuments('accountDetails');
-      const firestoreAccount = accountsData.find(
+      const firestoreAccount: any = accountsData.find(
         (acc: any) => acc.account === this.selectedAccount!.account
       );
 
@@ -169,24 +169,89 @@ export class UpdateLoanDetailsComponent implements OnInit {
       }
 
       // Update in Firestore
+      // Prepare loan history entry
+      const userDisplay = this.authService.getUserDisplayName();
+      const historyEntry = {
+        updated_at: new Date().toISOString(),
+        updated_by: userDisplay,
+        old_loan_amount: this.selectedAccount!.loan_amount,
+        new_loan_amount: this.newLoanAmount,
+        reason: this.updateReason || null
+      };
+
+      // Merge into existing loan_history (if any)
+      const existingHistory: any[] = firestoreAccount.loan_history || [];
+      const newHistory = [...existingHistory, historyEntry];
+
+      // Calculate new interest (3% of the loan amount)
+      const calculatedInterest = parseFloat(((this.newLoanAmount * 3) / 100).toFixed(2));
+
+      // Update upcoming unpaid dues (those not fully paid)
+      const existingDuePayments: any[] = firestoreAccount.due_payments || [];
+      const updatedDuePayments = existingDuePayments.map((p: any) => {
+        // Consider unpaid/partially paid/overdue as eligible for update
+        if (p.payment_status === 'paid') {
+          return p; // leave paid installments unchanged
+        }
+
+        const updated = { ...p };
+        // Set new loan interest
+        updated.loan_interest = calculatedInterest;
+        // Recompute total and balance
+        updated.total = parseFloat((Number(updated.due_amount || 0) + Number(updated.loan_interest || 0)).toFixed(2));
+        const paid = Number(updated.paid_amount || 0);
+        updated.balance_amount = parseFloat((updated.total - paid).toFixed(2));
+
+        // Update payment_status based on new balance
+        if (updated.balance_amount === 0) {
+          updated.payment_status = 'paid';
+        } else if (paid > 0) {
+          updated.payment_status = 'partial';
+        } else {
+          updated.payment_status = 'pending';
+        }
+
+        return updated;
+      });
+
+      // Persist loan_amount, loan_history and updated due_payments
       await this.firestoreService.updateDocument(
         'accountDetails',
         firestoreAccount.id,
-        { loan_amount: this.newLoanAmount }
+        { loan_amount: this.newLoanAmount, loan_history: newHistory, due_payments: updatedDuePayments }
       );
 
       // Update local data
+      // Ensure in-memory loan_history exists and append
+      if (!this.selectedAccount!.loan_history) {
+        this.selectedAccount!.loan_history = [];
+      }
+      this.selectedAccount!.loan_history.push(historyEntry);
+      // Update local due_payments as well so UI reflects new interest values
+      this.selectedAccount!.due_payments = updatedDuePayments;
       this.selectedAccount.loan_amount = this.newLoanAmount;
       const accountIndex = this.accounts.findIndex(
         acc => acc.account === this.selectedAccount!.account
       );
       if (accountIndex !== -1) {
+        // Keep loan_history in sync in the accounts array
+        if (!this.accounts[accountIndex].loan_history) {
+          this.accounts[accountIndex].loan_history = [];
+        }
+        this.accounts[accountIndex].loan_history.push(historyEntry);
+        // update due_payments for accounts list copy
+        this.accounts[accountIndex].due_payments = updatedDuePayments;
         this.accounts[accountIndex].loan_amount = this.newLoanAmount;
       }
       const filteredIndex = this.filteredAccounts.findIndex(
         acc => acc.account === this.selectedAccount!.account
       );
       if (filteredIndex !== -1) {
+        if (!this.filteredAccounts[filteredIndex].loan_history) {
+          this.filteredAccounts[filteredIndex].loan_history = [];
+        }
+        this.filteredAccounts[filteredIndex].loan_history.push(historyEntry);
+        this.filteredAccounts[filteredIndex].due_payments = updatedDuePayments;
         this.filteredAccounts[filteredIndex].loan_amount = this.newLoanAmount;
       }
 
@@ -250,4 +315,3 @@ export class UpdateLoanDetailsComponent implements OnInit {
     return colors[index];
   }
 }
-

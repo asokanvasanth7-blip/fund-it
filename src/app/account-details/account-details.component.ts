@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AccountDetails, AccountDetailsList, PaymentEntry } from '../models/account-details.model';
 import { FirestoreService } from '../services/firestore.service';
 import { AuthService } from '../services/auth.service';
@@ -37,7 +37,8 @@ export class AccountDetailsComponent implements OnInit {
 
   constructor(
     private firestoreService: FirestoreService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.hasEditAccess = this.authService.hasEditAccess();
   }
@@ -301,12 +302,8 @@ export class AccountDetailsComponent implements OnInit {
   }
 
   viewAccountDetails(account: AccountDetails) {
-    this.selectedAccount = account;
-    this.isEditingMobile = false;
-    this.editedMobile = '';
-    this.showPaymentDetails = true;
-    this.isEditingName = false;
-    this.editedName = '';
+    // Navigate to account informations page with account id as route param
+    this.router.navigate(['/account-information', account.account]);
   }
 
   closeDetails() {
@@ -1134,7 +1131,7 @@ export class AccountDetailsComponent implements OnInit {
       message += `Balance Due: *₹${payment.balance_amount.toLocaleString('en-IN')}*\n`;
     }
 
-    message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `\n━━━━━━━━━━━━━━��━━━━━━━\n`;
     message += `Please make the payment at your earliest convenience.\n\n`;
 
     message += `For any queries, please contact:\n`;

@@ -32,6 +32,25 @@ export interface PaymentEntry {
 
   /** The current payment status */
   payment_status: PaymentStatus;
+
+  /** Optional ISO timestamp when a payment was (last) collected for this installment */
+  collected_on?: string | null;
+}
+
+/**
+ * Entry describing a single loan update history record
+ */
+export interface LoanHistoryEntry {
+  /** ISO timestamp when the loan was updated */
+  updated_at: string;
+  /** Display name or email of the user who made the update */
+  updated_by: string;
+  /** Old loan amount before the update */
+  old_loan_amount: number;
+  /** New loan amount after the update */
+  new_loan_amount: number;
+  /** Optional reason/note for the update */
+  reason?: string | null;
 }
 
 /**
@@ -55,6 +74,9 @@ export interface AccountDetails {
 
   /** Array of payment entries for the due schedule */
   due_payments: PaymentEntry[];
+
+  /** Optional loan update history records */
+  loan_history?: LoanHistoryEntry[];
 }
 
 /**
@@ -85,4 +107,3 @@ export interface AccountSummary {
   /** Total outstanding balance across all accounts */
   totalOutstandingBalance: number;
 }
-

@@ -121,6 +121,26 @@ export class PaymentCollectionComponent implements OnInit {
     this.paymentSuccess = false;
     this.paymentError = null;
     this.paymentNotes = '';
+
+    // If payment already has a collected_on timestamp, pre-fill the paymentDate input
+    if (payment.collected_on) {
+      try {
+        const d = new Date(payment.collected_on);
+        if (!isNaN(d.getTime())) {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          this.paymentDate = `${year}-${month}-${day}`;
+        } else {
+          this.setTodayDate();
+        }
+      } catch (e) {
+        this.setTodayDate();
+      }
+    } else {
+      // default to today
+      this.setTodayDate();
+    }
   }
 
   closePaymentModal() {
@@ -173,7 +193,7 @@ export class PaymentCollectionComponent implements OnInit {
       }
 
       // Update payment details
-      const updatedPayment = { ...this.selectedPayment };
+      const updatedPayment = { ...this.selectedPayment } as PaymentEntry;
       updatedPayment.paid_amount += this.amountToPay;
       updatedPayment.balance_amount = updatedPayment.total - updatedPayment.paid_amount;
 
@@ -182,6 +202,17 @@ export class PaymentCollectionComponent implements OnInit {
         updatedPayment.payment_status = 'paid';
       } else if (updatedPayment.paid_amount > 0) {
         updatedPayment.payment_status = 'partial';
+      }
+
+      // Track collection timestamp (ISO string)
+      // Use the selected paymentDate (if user changed) or current time as fallback
+      try {
+        const userSelected = this.paymentDate ? new Date(this.paymentDate) : null;
+        updatedPayment.collected_on = (userSelected && !isNaN(userSelected.getTime()))
+          ? userSelected.toISOString()
+          : new Date().toISOString();
+      } catch (e) {
+        updatedPayment.collected_on = new Date().toISOString();
       }
 
       // Update in local array
@@ -215,7 +246,8 @@ export class PaymentCollectionComponent implements OnInit {
         amount: this.amountToPay,
         date: this.paymentDate,
         method: this.paymentMethod,
-        notes: this.paymentNotes
+        notes: this.paymentNotes,
+        collected_on: updatedPayment.collected_on
       });
 
       this.paymentSuccess = true;
@@ -400,30 +432,122 @@ export class PaymentCollectionComponent implements OnInit {
 
   // Generate receipt message text
   generateReceiptMessage(account: AccountDetails, payment: PaymentEntry): string {
+    const collectedOnText = payment.collected_on
+      ? new Date(payment.collected_on).toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : new Date().toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const statusEmoji = this.getPaymentStatusEmoji(payment.payment_status);
+    const balanceEmoji = (payment.total - payment.paid_amount) > 0 ? '⚠️' : '✅';
+
+    // Option 1: Tree-style format (better for readability)
     const message = `
-*PAYMENT RECEIPT*
-━━━━━━━━━━━━━━━━━━━━
+🧾 *Azhisukkudi Amavasai Fund - PAYMENT RECEIPT*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-*Account Details:*
-Name: ${account.name}
-Account ID: ${account.account}
-Mobile: ${account.mobile || 'N/A'}
+👤 *Account Details*
+├ Name: *${account.name}*
+├ Account ID: \`${account.account}\`
+└ Mobile: ${account.mobile || 'N/A'}
 
-*Payment Details:*
-Due No: ${payment.due_no}
-Due Date: ${payment.due_date}
-Total Due: ₹${payment.total.toFixed(2)}
-Paid Amount: ₹${payment.paid_amount.toFixed(2)}
-Balance: ₹${(payment.total - payment.paid_amount).toFixed(2)}
-Status: ${payment.payment_status.toUpperCase()}
+💰 *Payment Details*
+├ Due No: \`#${payment.due_no}\`
+├ Due Date: ${payment.due_date}
+├ Collected On: ${collectedOnText}
+├ Total Due: ₹*${payment.total.toFixed(2)}*
+├ Paid Amount: ✅ ₹*${payment.paid_amount.toFixed(2)}*
+├ Balance: ${balanceEmoji} ₹*${(payment.total - payment.paid_amount).toFixed(2)}*
+└ Status: ${statusEmoji} *${payment.payment_status.toUpperCase()}*
 
-━━━━━━━━━━━━━━━━━━━━
-*Thank you for your payment!*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ *Thank you for your payment!* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Generated on: ${new Date().toLocaleDateString('en-IN')}
+📞 For queries, contact:
+*+91-8973576694 - Sathish Kumar Ramalingam*
+
+📅 Generated: ${new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}
+
+_Azhisukkudi Amavasai Fund_
     `.trim();
 
     return message;
+  }
+
+  // Alternative: Table-style format using monospace
+  generateReceiptMessageTableStyle(account: AccountDetails, payment: PaymentEntry): string {
+    const collectedOnText = payment.collected_on
+      ? new Date(payment.collected_on).toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : new Date().toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const statusEmoji = this.getPaymentStatusEmoji(payment.payment_status);
+    const balanceEmoji = (payment.total - payment.paid_amount) > 0 ? '⚠️' : '✅';
+
+    const balance = (payment.total - payment.paid_amount).toFixed(2);
+
+    const message = `
+🧾 *PAYMENT RECEIPT*
+━━━━━━━━━━━━━━━━━━━━
+
+👤 *ACCOUNT DETAILS*
+\`\`\`
+Name     : ${account.name}
+Account  : ${account.account}
+Mobile   : ${account.mobile || 'N/A'}
+\`\`\`
+
+💰 *PAYMENT SUMMARY*
+\`\`\`
+Due No   : #${payment.due_no}
+Due Date : ${payment.due_date}
+Collected: ${collectedOnText}
+\`\`\`
+
+*AMOUNT BREAKDOWN*
+\`\`\`
+Total Due    : ₹ ${payment.total.toFixed(2).padStart(10)}
+Paid Amount  : ₹ ${payment.paid_amount.toFixed(2).padStart(10)}
+Balance      : ₹ ${balance.padStart(10)}
+\`\`\`
+
+${statusEmoji} Status: *${payment.payment_status.toUpperCase()}*
+
+━━━━━━━━━━━━━━━━━━━━
+✨ *Thank you for your payment!* ✨
+
+📞 +91-8973576694
+📅 ${new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}
+
+_Azhisukkudi Amavasai Fund_
+    `.trim();
+
+    return message;
+  }
+
+  // Get payment status emoji
+  private getPaymentStatusEmoji(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return '✅';
+      case 'partial':
+        return '⚠️';
+      case 'pending':
+      case 'overdue':
+        return '❌';
+      default:
+        return '📋';
+    }
   }
 
   // Export PDF receipt
@@ -450,6 +574,10 @@ Generated on: ${new Date().toLocaleDateString('en-IN')}
 
   // Generate receipt HTML for PDF
   generateReceiptHTML(account: AccountDetails, payment: PaymentEntry): string {
+    const collectedOnDisplay = payment.collected_on
+      ? new Date(payment.collected_on).toLocaleString('en-IN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : 'N/A';
+
     return `
 <!DOCTYPE html>
 <html>
@@ -581,6 +709,10 @@ Generated on: ${new Date().toLocaleDateString('en-IN')}
       <div class="receipt-row">
         <span class="receipt-label">Due Date:</span>
         <span class="receipt-value">${payment.due_date}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Collected On:</span>
+        <span class="receipt-value">${collectedOnDisplay}</span>
       </div>
       <div class="receipt-row">
         <span class="receipt-label">Total Due Amount:</span>
