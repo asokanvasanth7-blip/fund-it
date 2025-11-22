@@ -129,4 +129,40 @@ export class FirestoreService {
       throw error;
     }
   }
+
+  async getDocumentById(collectionName: string, docId: string) {
+    try {
+      const docRef = doc(this.firestore, collectionName, docId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting document:', error);
+      throw error;
+    }
+  }
+
+  async updateDocumentById(collectionName: string, docId: string, data: any) {
+    try {
+      const docRef = doc(this.firestore, collectionName, docId);
+      await updateDoc(docRef, data);
+    } catch (error) {
+      console.error('Error updating document:', error);
+      throw error;
+    }
+  }
+
+  async deleteDocumentById(collectionName: string, docId: string) {
+    try {
+      const docRef = doc(this.firestore, collectionName, docId);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      throw error;
+    }
+  }
+
+  
 }
