@@ -1,365 +1,161 @@
-<!-- Hero Section - Fund Management Style -->
-<div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #dbeafe 100%); color: #1e293b;">
-  <div class="container py-5">
-
-    <div class="row align-items-center">
-      <div class="col-lg-6 col-md-12">
-        <div class="mb-3">
-          <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 0.85rem; padding: 0.5rem 1rem;">Fund IT 💰</span>
-        </div>
-        <h1 class="display-4 fw-bold mb-3" style="font-size: 2.5rem; color: #0f172a;">Amavasai Fund<br>Management System</h1>
-        <p class="lead mb-4" style="color: #475569;">Manage member accounts, track fund collections, process loan payments, and monitor due schedules - all in one comprehensive platform.</p>
-        <div class="d-grid gap-3 d-md-flex mb-3">
-          <button class="btn btn-lg px-4 py-3" type="button" routerLink="/dashboard" style="border-radius: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-weight: 600;">
+<!-- Hero Section -->
+<div class="home-container">
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="badge-pill">Fund IT 💰</div>
+        <h1 class="display-title">Amavasai Fund<br>Management System</h1>
+        <p class="lead-text">Manage member accounts, track fund collections, process loan payments, and monitor due schedules - all in one comprehensive platform.</p>
+        
+        <div class="hero-actions">
+          <button class="btn-hero btn-primary" routerLink="/dashboard">
             📊 Go to Dashboard
           </button>
-          <button class="btn btn-outline-primary btn-lg px-4 py-3" type="button" routerLink="/login" style="border-radius: 16px; border-width: 2px; font-weight: 600;">
+          <button class="btn-hero btn-outline" routerLink="/login">
             🔐 Login
           </button>
         </div>
-        <p class="small mb-0" style="color: #64748b;">
-          <span class="me-3">✓ Track member funds</span>
-          <span class="me-3">✓ Manage loans</span>
-          <span>✓ Monitor payments</span>
-        </p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="check-icon">✓</span> Track funds
+          </div>
+          <div class="feature-item">
+            <span class="check-icon">✓</span> Manage loans
+          </div>
+          <div class="feature-item">
+            <span class="check-icon">✓</span> Monitor payments
+          </div>
+        </div>
       </div>
-      <div class="col-lg-6 text-center mt-4 mt-lg-0 d-none d-lg-block">
-        <div style="font-size: 12rem; opacity: 0.3; line-height: 1;">💰</div>
+
+      <div class="hero-visual">
+        <div class="hero-icon">💰</div>
       </div>
     </div>
   </div>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-value">{{totalMembers}}</div>
+        <div class="stat-label">Total Members</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value text-green">₹{{totalFundAmount | number:'1.0-0'}}</div>
+        <div class="stat-label">Total Fund Amount</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value text-blue">₹{{totalLoanAmount | number:'1.0-0'}}</div>
+        <div class="stat-label">Active Loans</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="features-section">
+    <div class="section-header">
+      <h2 class="section-title">Powerful Features</h2>
+      <p class="section-subtitle">Everything you need to manage your Ammuvadi fund efficiently</p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Account Management -->
+      <div class="feature-card">
+        <div class="card-header">
+          <div class="icon-box icon-blue">👥</div>
+          <div class="card-title-group">
+            <h3>Account Management</h3>
+            <span class="feature-badge">Core Feature</span>
+          </div>
+        </div>
+        <p class="card-desc">View and manage all member accounts with detailed fund and loan information. Track individual contributions effortlessly.</p>
+        <ul class="feature-list-small">
+          <li><span>✓</span> View all accounts</li>
+          <li><span>✓</span> Track fund amounts</li>
+          <li><span>✓</span> Monitor loan details</li>
+        </ul>
+        <button class="btn-card" routerLink="/account-details">Go to Accounts →</button>
+      </div>
+
+      <!-- Payment Collection -->
+      <div class="feature-card">
+        <div class="card-header">
+          <div class="icon-box icon-green">💳</div>
+          <div class="card-title-group">
+            <h3>Payment Collection</h3>
+            <span class="feature-badge">Essential</span>
+          </div>
+        </div>
+        <p class="card-desc">Record and track monthly payments from members. Generate payment receipts and maintain accurate financial records.</p>
+        <ul class="feature-list-small">
+          <li><span>✓</span> Record payments</li>
+          <li><span>✓</span> Generate receipts</li>
+          <li><span>✓</span> Track due dates</li>
+        </ul>
+        <button class="btn-card" routerLink="/payment-collection">Collect Payment →</button>
+      </div>
+
+      <!-- Due Schedule -->
+      <div class="feature-card">
+        <div class="card-header">
+          <div class="icon-box icon-orange">📅</div>
+          <div class="card-title-group">
+            <h3>Due Schedule</h3>
+            <span class="feature-badge">Automated</span>
+          </div>
+        </div>
+        <p class="card-desc">Automated 24-month payment schedule tracking. Monitor pending, paid, and overdue payments with real-time status updates.</p>
+        <ul class="feature-list-small">
+          <li><span>✓</span> 24-month tracking</li>
+          <li><span>✓</span> Auto-generated dues</li>
+          <li><span>✓</span> Status indicators</li>
+        </ul>
+        <button class="btn-card" routerLink="/due-schedule">View Schedule →</button>
+      </div>
+
+      <!-- Data Upload -->
+      <div class="feature-card">
+        <div class="card-header">
+          <div class="icon-box icon-teal">📤</div>
+          <div class="card-title-group">
+            <h3>Data Upload</h3>
+            <span class="feature-badge">Import</span>
+          </div>
+        </div>
+        <p class="card-desc">Import account and schedule data from JSON files directly to Firebase. Bulk upload for quick system setup.</p>
+        <ul class="feature-list-small">
+          <li><span>✓</span> JSON file upload</li>
+          <li><span>✓</span> Bulk import</li>
+          <li><span>✓</span> Firebase sync</li>
+        </ul>
+        <button class="btn-card" routerLink="/upload">Upload Data →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <div class="cta-card">
+      <h2 class="cta-title">Streamline Your Fund Management</h2>
+      <p class="cta-text">Manage your Ammuvadi fund with ease. Track members, collect payments, and monitor schedules all in one place.</p>
+      <div class="cta-buttons">
+        <button class="btn-hero btn-primary" routerLink="/account-details">View Accounts →</button>
+        <button class="btn-hero btn-outline" routerLink="/payment-collection">Collect Payment →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 FundIt. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Terms</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+    </div>
+  </footer>
 </div>
-
-<!-- Stats Section - Fund Overview -->
-<div class="bg-light-custom py-5">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="card shadow-sm" style="border-radius: 20px; background: white;">
-          <div class="card-body p-4">
-            <div class="row text-center g-4">
-              <div class="col-4">
-                <div class="stats-item">
-                  <h3 class="text-primary-green fw-bold mb-1" style="font-size: 1.75rem;">{{totalMembers}}</h3>
-                  <small class="text-muted d-block" style="font-size: 0.85rem;">Total Members</small>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="stats-item">
-                  <h3 class="text-success-custom fw-bold mb-1" style="font-size: 1.75rem;">₹{{totalFundAmount | number:'1.0-0'}}</h3>
-                  <small class="text-muted d-block" style="font-size: 0.85rem;">Total Fund Amount</small>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="stats-item">
-                  <h3 class="text-primary-green fw-bold mb-1" style="font-size: 1.75rem;">₹{{totalLoanAmount | number:'1.0-0'}}</h3>
-                  <small class="text-muted d-block" style="font-size: 0.85rem;">Active Loans</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Key Features Section -->
-<div class="container py-5">
-  <div class="row mb-4">
-    <div class="col-12 text-center">
-      <div>
-        <h2 class="mb-2 fw-bold" style="color: #1a1a1a;">Powerful Features for Fund Management</h2>
-        <p class="text-muted mb-0">Everything you need to manage your Ammuvadi fund efficiently</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="row g-4">
-    <!-- Account Management -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 feature-card" style="border-radius: 20px; background: white; border: 2px solid #f0f0f0; transition: all 0.3s ease;">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start mb-3">
-            <div class="icon-circle me-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
-              👥
-            </div>
-            <div>
-              <h5 class="card-title mb-1 fw-bold" style="font-size: 1.2rem; color: #1a1a1a;">Account Management</h5>
-              <span class="badge" style="background-color: #F5F7FA; color: #667eea; font-weight: 600;">Core Feature</span>
-            </div>
-          </div>
-
-          <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-            View and manage all member accounts with detailed fund and loan information. Track individual contributions and balances effortlessly.
-          </p>
-
-          <div class="mt-auto">
-            <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> View all accounts</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Track fund amounts</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Monitor loan details</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Payment schedules</li>
-            </ul>
-            <button class="btn btn-outline-primary w-100 py-2" routerLink="/account-details" style="border-radius: 12px; font-weight: 600; border-width: 2px;">
-              Go to Accounts →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payment Collection -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 feature-card" style="border-radius: 20px; background: white; border: 2px solid #f0f0f0; transition: all 0.3s ease;">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start mb-3">
-            <div class="icon-circle me-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
-              💳
-            </div>
-            <div>
-              <h5 class="card-title mb-1 fw-bold" style="font-size: 1.2rem; color: #1a1a1a;">Payment Collection</h5>
-              <span class="badge" style="background-color: #F5F7FA; color: #28a745; font-weight: 600;">Essential</span>
-            </div>
-          </div>
-
-          <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-            Record and track monthly payments from members. Generate payment receipts and maintain accurate financial records automatically.
-          </p>
-
-          <div class="mt-auto">
-            <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Record payments</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Generate receipts</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Track due dates</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Payment history</li>
-            </ul>
-            <button class="btn btn-outline-success w-100 py-2" routerLink="/payment-collection" style="border-radius: 12px; font-weight: 600; border-width: 2px;">
-              Collect Payment →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Due Schedule Management -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 feature-card" style="border-radius: 20px; background: white; border: 2px solid #f0f0f0; transition: all 0.3s ease;">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start mb-3">
-            <div class="icon-circle me-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
-              📅
-            </div>
-            <div>
-              <h5 class="card-title mb-1 fw-bold" style="font-size: 1.2rem; color: #1a1a1a;">Due Schedule</h5>
-              <span class="badge" style="background-color: #F5F7FA; color: #ffc107; font-weight: 600;">Automated</span>
-            </div>
-          </div>
-
-          <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-            Automated 24-month payment schedule tracking. Monitor pending, paid, and overdue payments with real-time status updates.
-          </p>
-
-          <div class="mt-auto">
-            <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> 24-month tracking</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Auto-generated dues</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Status indicators</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Balance tracking</li>
-            </ul>
-            <button class="btn btn-outline-warning w-100 py-2" routerLink="/due-schedule" style="border-radius: 12px; font-weight: 600; border-width: 2px; color: #856404;">
-              View Schedule →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Data Upload -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 feature-card" style="border-radius: 20px; background: white; border: 2px solid #f0f0f0; transition: all 0.3s ease;">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start mb-3">
-            <div class="icon-circle me-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
-              📤
-            </div>
-            <div>
-              <h5 class="card-title mb-1 fw-bold" style="font-size: 1.2rem; color: #1a1a1a;">Data Upload</h5>
-              <span class="badge" style="background-color: #F5F7FA; color: #17a2b8; font-weight: 600;">Import</span>
-            </div>
-          </div>
-
-          <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-            Import account and schedule data from JSON files directly to Firebase. Bulk upload for quick system setup and data migration.
-          </p>
-
-          <div class="mt-auto">
-            <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> JSON file upload</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Bulk import</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Firebase sync</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Quick setup</li>
-            </ul>
-            <button class="btn btn-outline-info w-100 py-2" routerLink="/upload" style="border-radius: 12px; font-weight: 600; border-width: 2px;">
-              Upload Data →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Update Loan Details -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 feature-card" style="border-radius: 20px; background: white; border: 2px solid #f0f0f0; transition: all 0.3s ease;">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start mb-3">
-            <div class="icon-circle me-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
-              💰
-            </div>
-            <div>
-              <h5 class="card-title mb-1 fw-bold" style="font-size: 1.2rem; color: #1a1a1a;">Update Loan Details</h5>
-              <span class="badge" style="background-color: #F5F7FA; color: #28a745; font-weight: 600;">Financial</span>
-            </div>
-          </div>
-
-          <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-            Manage fund amounts and loan amounts for member accounts. Update financial details with real-time balance calculations.
-          </p>
-
-          <div class="mt-auto">
-            <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Update fund amounts</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Manage loan amounts</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Net balance tracking</li>
-              <li class="mb-2"><span class="text-success fw-bold">✓</span> Real-time updates</li>
-            </ul>
-            <button class="btn btn-outline-success w-100 py-2" routerLink="/update-loan-details" style="border-radius: 12px; font-weight: 600; border-width: 2px;">
-              Manage Loans →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add New Account -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 feature-card" style="border-radius: 20px; background: linear-gradient(135deg, #90EE90 0%, #4CAF50 100%); border: none; transition: all 0.3s ease;">
-        <div class="card-body p-4 d-flex flex-column text-white">
-          <div class="d-flex align-items-start mb-3">
-            <div class="icon-circle me-3" style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.3); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
-              ➕
-            </div>
-            <div>
-              <h5 class="card-title mb-1 fw-bold" style="font-size: 1.2rem;">Add New Member</h5>
-              <span class="badge bg-white" style="color: #4CAF50; font-weight: 600;">Quick Action</span>
-            </div>
-          </div>
-
-          <p class="card-text mb-3" style="font-size: 0.95rem; line-height: 1.6; opacity: 0.95;">
-            Create new member accounts instantly with auto-generated account numbers and payment schedules. Start managing in seconds!
-          </p>
-
-          <div class="mt-auto">
-            <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
-              <li class="mb-2"><span class="fw-bold">✓</span> Auto account number</li>
-              <li class="mb-2"><span class="fw-bold">✓</span> Auto payment schedule</li>
-              <li class="mb-2"><span class="fw-bold">✓</span> Instant setup</li>
-              <li class="mb-2"><span class="fw-bold">✓</span> Ready to use</li>
-            </ul>
-            <button class="btn btn-light w-100 py-2" routerLink="/account-details" style="border-radius: 12px; font-weight: 600; color: #2D5016;">
-              Add New Account →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- How It Works Section -->
-<div class="bg-white py-5 mt-4">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold mb-2" style="color: #1a1a1a;">How Ammuvadi Fund Works</h2>
-      <p class="text-muted">Simple and transparent fund management process</p>
-    </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card h-100" style="border-radius: 20px; border: 2px solid #F5F7FA; background: white;">
-          <div class="card-body p-4 text-center">
-            <div class="icon-circle mx-auto mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-              👤
-            </div>
-            <h4 class="fw-bold mb-3" style="color: #1a1a1a; font-size: 1.25rem;">1. Member Registration</h4>
-            <p class="text-muted mb-0" style="font-size: 0.95rem;">Add new members with auto-generated account numbers and payment schedules. Quick and easy setup!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100" style="border-radius: 20px; border: 2px solid #F5F7FA; background: white;">
-          <div class="card-body p-4 text-center">
-            <div class="icon-circle mx-auto mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-              💰
-            </div>
-            <h4 class="fw-bold mb-3" style="color: #1a1a1a; font-size: 1.25rem;">2. Monthly Collections</h4>
-            <p class="text-muted mb-0" style="font-size: 0.95rem;">Collect monthly fund contributions and loan payments with automated tracking and instant receipt generation.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100" style="border-radius: 20px; border: 2px solid #F5F7FA; background: white;">
-          <div class="card-body p-4 text-center">
-            <div class="icon-circle mx-auto mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-              📊
-            </div>
-            <h4 class="fw-bold mb-3" style="color: #1a1a1a; font-size: 1.25rem;">3. Track & Monitor</h4>
-            <p class="text-muted mb-0" style="font-size: 0.95rem;">Monitor all payments, track due schedules, and manage fund balances in real-time with detailed reports.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CTA Section -->
-<div class="bg-light-custom py-5">
-  <div class="container py-4">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card" style="border-radius: 24px; background: linear-gradient(135deg, #2D5016 0%, #3d6b1f 100%); border: none;">
-          <div class="card-body p-5 text-center text-white">
-            <h2 class="fw-bold mb-3" style="font-size: 2rem;">Streamline Your Fund Management Today</h2>
-            <p class="lead mb-4 opacity-90" style="font-size: 1.1rem;">Manage your Ammuvadi fund with ease. Track members, collect payments, and monitor schedules all in one place.</p>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-              <button class="btn btn-light btn-lg px-5 py-3" routerLink="/account-details" style="border-radius: 16px; font-weight: 600; color: #2D5016;">
-                View Accounts →
-              </button>
-              <button class="btn btn-outline-light btn-lg px-5 py-3" routerLink="/payment-collection" style="border-radius: 16px; font-weight: 600; border-width: 2px;">
-                Collect Payment →
-              </button>
-            </div>
-            <p class="mt-4 mb-0 small opacity-75">Secure • Real-time tracking • Automated receipts</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Footer -->
-<footer class="bg-white py-4 border-top">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-        <p class="text-muted mb-0 small">© 2025 FundIt. All rights reserved.</p>
-      </div>
-      <div class="col-md-6 text-center text-md-end">
-        <a href="#" class="text-muted text-decoration-none small me-3">Privacy</a>
-        <a href="#" class="text-muted text-decoration-none small me-3">Terms</a>
-        <a href="#" class="text-muted text-decoration-none small">Contact</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-

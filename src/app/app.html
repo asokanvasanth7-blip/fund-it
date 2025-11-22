@@ -1,81 +1,84 @@
 <!-- Side Navigation Layout -->
 <div class="app-container">
-  <!-- Sidebar -->
-  <aside class="sidebar" [class.sidebar-collapsed]="sidebarCollapsed">
-    <!-- Logo Section -->
-    <div class="sidebar-header">
-      <div class="logo-container">
-        <span class="logo-icon">💰</span>
-        <span class="logo-text" [hidden]="sidebarCollapsed && !isMobile">Fund<span style="color: #90EE90;">It</span></span>
+  <!-- Sidebar (Only visible when logged in) -->
+  <ng-container *ngIf="user$ | async as user">
+    <aside class="sidebar" [class.sidebar-collapsed]="sidebarCollapsed">
+      <!-- Logo Section -->
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <span class="logo-icon">💰</span>
+          <span class="logo-text" [hidden]="sidebarCollapsed && !isMobile">Fund<span class="logo-highlight">It</span></span>
+        </div>
       </div>
-    </div>
 
-    <!-- Navigation Menu -->
-    <nav class="sidebar-nav">
-      <ul class="nav-list">
-        <li class="nav-item">
-          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Home</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/account-details" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">👥</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Accounts</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/payment-collection" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">💳</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Collect Payment</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/update-due-details" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">✏️</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Update Due</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/update-loan-details" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">💰</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Update Loan</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/due-schedule" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">📅</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Due Schedule</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/due-report" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">📊</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Due Report</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/bulk-fund-update" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">📦</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Bulk Fund Update</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/upload" routerLinkActive="active" class="nav-link">
-            <span class="nav-icon">📤</span>
-            <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Upload Data</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
+      <!-- Navigation Menu -->
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+              <span class="nav-icon">🏠</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Home</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/account-details" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">👥</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Accounts</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/payment-collection" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">💳</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Collect Payment</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/update-due-details" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">✏️</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Update Due</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/update-loan-details" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">💰</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Update Loan</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/due-schedule" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">📅</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Due Schedule</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/due-report" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">📊</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Due Report</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/bulk-fund-update" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">📦</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Bulk Fund Update</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/upload" routerLinkActive="active" class="nav-link">
+              <span class="nav-icon">📤</span>
+              <span class="nav-text" [hidden]="sidebarCollapsed && !isMobile">Upload Data</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-    <!-- Auth Section at Bottom -->
-    <div class="sidebar-footer">
-      <ng-container *ngIf="user$ | async as user; else notLoggedIn">
+      <!-- Auth Section at Bottom -->
+      <div class="sidebar-footer">
         <div class="user-section">
           <div class="user-info" [hidden]="sidebarCollapsed && !isMobile">
-            <span class="user-icon">👤</span>
+            <img *ngIf="user.photoURL" [src]="user.photoURL" class="sidebar-profile-image" alt="Profile" referrerpolicy="no-referrer">
+            <div *ngIf="!user.photoURL" class="sidebar-profile-avatar">
+              {{ (user.displayName || user.email || 'U').charAt(0).toUpperCase() }}
+            </div>
             <div class="user-details">
               <span class="user-name">{{ getUserDisplayName() }}</span>
               <span class="user-email">{{ user.email }}</span>
@@ -86,24 +89,18 @@
             <span [hidden]="!sidebarCollapsed || isMobile">🚪</span>
           </button>
         </div>
-      </ng-container>
-      <ng-template #notLoggedIn>
-        <button class="btn-login" (click)="goToLogin()">
-          <span [hidden]="sidebarCollapsed && !isMobile">Login / Sign Up</span>
-          <span [hidden]="!sidebarCollapsed || isMobile">🔑</span>
-        </button>
-      </ng-template>
-    </div>
+      </div>
 
-    <!-- Toggle Button -->
-    <button class="sidebar-toggle" (click)="toggleSidebar()">
-      <span *ngIf="!sidebarCollapsed">◀</span>
-      <span *ngIf="sidebarCollapsed">▶</span>
-    </button>
-  </aside>
+      <!-- Toggle Button -->
+      <button class="sidebar-toggle" (click)="toggleSidebar()">
+        <span *ngIf="!sidebarCollapsed">◀</span>
+        <span *ngIf="sidebarCollapsed">▶</span>
+      </button>
+    </aside>
+  </ng-container>
 
   <!-- Main Content Area -->
-  <main class="main-content" [class.main-content-expanded]="sidebarCollapsed">
+  <main class="main-content" [class.main-content-expanded]="sidebarCollapsed" [class.no-sidebar]="!(user$ | async)">
     <!-- App Header (Desktop) -->
     <header class="app-header" *ngIf="user$ | async as user">
       <div class="header-content">
@@ -131,17 +128,17 @@
       </div>
     </header>
 
-    <!-- Top Bar for Mobile -->
-    <div class="mobile-topbar">
+    <!-- Top Bar for Mobile (Only visible when logged in) -->
+    <div class="mobile-topbar" *ngIf="user$ | async as user">
       <button class="mobile-menu-btn" (click)="toggleSidebar()">
         ☰
       </button>
       <div class="mobile-logo">
         <span>💰</span>
-        <span class="ms-2">Fund<span style="color: #90EE90;">It</span></span>
+        <span class="ms-2">Fund<span class="logo-highlight">It</span></span>
       </div>
       <!-- Mobile Profile -->
-      <div class="mobile-profile" *ngIf="user$ | async as user">
+      <div class="mobile-profile">
         <button class="mobile-profile-btn" (click)="toggleProfileDropdown($event)">
           <img
             *ngIf="user.photoURL"
@@ -220,4 +217,3 @@
     </div>
   </div>
 </div>
-

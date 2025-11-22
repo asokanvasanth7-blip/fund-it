@@ -2,8 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DueScheduleList } from '../models/due-schedule.model';
 import { FirestoreService } from '../services/firestore.service';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
+// ... (inside class)
+
+
 
 @Component({
   selector: 'app-due-schedule',
