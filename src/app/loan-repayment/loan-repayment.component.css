@@ -518,13 +518,54 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .content-grid { grid-template-columns: 260px 1fr; }
+  .content-grid {
+    grid-template-columns: 240px 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .loan-repayment-container { padding: 1rem; }
-  .content-grid { grid-template-columns: 1fr; }
-  .accounts-panel { max-height: 400px; margin-bottom: 1.5rem; }
-  .action-buttons { flex-direction: column; }
-  .summary-grid { grid-template-columns: 1fr; }
+  .loan-repayment-container {
+    padding: 1rem;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .accounts-panel {
+    max-height: 300px;
+    margin-bottom: 0;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-control,
+  .form-select {
+    font-size: 16px;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 576px) {
+  .loan-repayment-container {
+    padding: 0.75rem;
+  }
+
+  .accounts-panel {
+    max-height: 250px;
+  }
 }

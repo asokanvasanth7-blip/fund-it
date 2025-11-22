@@ -151,7 +151,43 @@ h2 {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .upload-container { padding: 1rem; }
-  .actions { flex-direction: column; }
-  .btn { width: 100%; }
+  .upload-container {
+    padding: 1rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .upload-card {
+    padding: 1.25rem;
+  }
+
+  .upload-area {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .upload-container {
+    padding: 0.75rem;
+  }
+
+  .upload-card {
+    padding: 1rem;
+  }
+
+  .upload-area {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .info ol li {
+    font-size: 0.85rem;
+  }
 }

@@ -34,7 +34,7 @@ export class App implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      if (this.isMobile) {
+      if (this.isMobile && !this.sidebarCollapsed) {
         this.sidebarCollapsed = true;
       }
     });

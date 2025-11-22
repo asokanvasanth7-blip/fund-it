@@ -666,12 +666,49 @@ textarea.form-control {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .content-layout { grid-template-columns: 260px 1fr; }
+  .content-layout {
+    grid-template-columns: 240px 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .update-loan-container { padding: 1rem; }
-  .content-layout { grid-template-columns: 1fr; }
-  .accounts-sidebar { max-height: 400px; position: static; margin-bottom: 1.5rem; }
-  .summary-stats { grid-template-columns: 1fr; }
+  .update-loan-container {
+    padding: 1rem;
+  }
+
+  .content-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .accounts-sidebar {
+    max-height: 300px;
+    position: static;
+    margin-bottom: 0;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-control,
+  .form-select {
+    font-size: 16px;
+    min-height: 48px;
+  }
+
+  .btn {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 576px) {
+  .update-loan-container {
+    padding: 0.75rem;
+  }
+
+  .accounts-sidebar {
+    max-height: 250px;
+  }
 }

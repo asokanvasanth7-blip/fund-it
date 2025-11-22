@@ -498,21 +498,40 @@
 .mobile-cards-container { display: none; }
 
 @media (max-width: 1024px) {
-  .content-layout { grid-template-columns: 260px 1fr; }
+  .content-layout {
+    grid-template-columns: 240px 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .update-due-container { padding: 1rem; }
-  .content-layout { display: flex; flex-direction: column; }
-  .accounts-sidebar { height: 400px; }
-  
-  .table-container { display: none; }
-  .mobile-cards-container { display: block; }
+  .update-due-container {
+    padding: 1rem;
+  }
+
+  .content-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .accounts-sidebar {
+    height: auto;
+    max-height: 300px;
+    margin-bottom: 1rem;
+  }
+
+  .table-container {
+    display: none;
+  }
+
+  .mobile-cards-container {
+    display: block;
+  }
 
   .due-card {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1rem;
     margin-bottom: 1rem;
   }

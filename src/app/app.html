@@ -2,7 +2,7 @@
 <div class="app-container">
   <!-- Sidebar (Only visible when logged in) -->
   <ng-container *ngIf="user$ | async as user">
-    <aside class="sidebar" [class.sidebar-collapsed]="sidebarCollapsed">
+    <aside class="sidebar" [class.sidebar-collapsed]="sidebarCollapsed" [class.active]="!sidebarCollapsed && isMobile">
       <!-- Logo Section -->
       <div class="sidebar-header">
         <div class="logo-container">
@@ -97,6 +97,9 @@
         <span *ngIf="sidebarCollapsed">▶</span>
       </button>
     </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" [class.active]="!sidebarCollapsed && isMobile" (click)="toggleSidebar()"></div>
   </ng-container>
 
   <!-- Main Content Area -->

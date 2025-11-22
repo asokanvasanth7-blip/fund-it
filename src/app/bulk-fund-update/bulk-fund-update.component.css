@@ -497,10 +497,63 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .bulk-update-container { padding: 1rem; }
-  .input-with-button { flex-direction: column; }
-  .selection-summary { flex-direction: column; gap: 1rem; }
-  .table-container { overflow-x: auto; }
-  .accounts-table { min-width: 800px; }
-  .progress-stats { flex-direction: column; gap: 0.5rem; }
+  .bulk-update-container {
+    padding: 1rem;
+  }
+
+  .input-with-button {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .input-with-button .form-control {
+    font-size: 16px;
+    min-height: 48px;
+  }
+
+  .input-with-button .btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .selection-summary {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+
+  .accounts-table {
+    min-width: 800px;
+    font-size: 0.85rem;
+  }
+
+  .progress-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .bulk-update-container {
+    padding: 0.75rem;
+  }
+
+  .accounts-table {
+    font-size: 0.8rem;
+  }
 }
